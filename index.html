@@ -1,0 +1,1085 @@
+<title>Friendsly</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F5FF;
+  --surface:#FFFFFF;
+  --surface-2:#F0ECFF;
+  --border:#E3DCFF;
+  --text:#1B1035;
+  --text-muted:#6B6180;
+  --accent:#5B3DF5;
+  --accent-dark:#4526E0;
+  --accent-soft:#EDE8FF;
+  --success:#1FAE5C;
+  --success-soft:#E3F9EC;
+  --error:#F0355A;
+  --error-soft:#FEE7EC;
+  --gold:#F5A623;
+  --shadow: 0 2px 0 var(--border);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#150E28;
+    --surface:#201735;
+    --surface-2:#271D40;
+    --border:#382C57;
+    --text:#F3EFFF;
+    --text-muted:#B3A6D6;
+    --accent:#8B7CFA;
+    --accent-dark:#A497FF;
+    --accent-soft:#2E2350;
+    --success:#3DDC84;
+    --success-soft:#173327;
+    --error:#FF5C7C;
+    --error-soft:#3A1826;
+    --gold:#F6BB4E;
+    --shadow: 0 2px 0 var(--border);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#150E28;
+  --surface:#201735;
+  --surface-2:#271D40;
+  --border:#382C57;
+  --text:#F3EFFF;
+  --text-muted:#B3A6D6;
+  --accent:#8B7CFA;
+  --accent-dark:#A497FF;
+  --accent-soft:#2E2350;
+  --success:#3DDC84;
+  --success-soft:#173327;
+  --error:#FF5C7C;
+  --error-soft:#3A1826;
+  --gold:#F6BB4E;
+  --shadow: 0 2px 0 var(--border);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,sans-serif;
+  padding-inline:16px;
+  padding-block:20px;
+  display:flex;
+  justify-content:center;
+}
+h1,h2,h3,.display{font-family:'Baloo 2',system-ui,sans-serif;text-wrap:balance;}
+
+#app{
+  width:100%;
+  max-width:480px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:36px;
+}
+.iconbtn{
+  border:none;
+  background:none;
+  color:var(--text-muted);
+  font-size:22px;
+  cursor:pointer;
+  padding:4px 8px;
+  border-radius:10px;
+  line-height:1;
+}
+.iconbtn:hover{background:var(--surface-2);}
+.progress-track{
+  flex:1;
+  height:14px;
+  background:var(--surface-2);
+  border-radius:999px;
+  overflow:hidden;
+  border:1px solid var(--border);
+}
+.progress-fill{
+  height:100%;
+  background:var(--success);
+  border-radius:999px;
+  transition:width .35s ease;
+  width:0%;
+}
+.stat{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  font-weight:800;
+  font-family:'Baloo 2',sans-serif;
+  font-size:15px;
+  white-space:nowrap;
+}
+.stat.hearts{color:var(--error);}
+.stat.streak{color:var(--gold);}
+
+/* ---------- Home screen ---------- */
+.hero{
+  background:linear-gradient(155deg,var(--accent) 0%, var(--accent-dark) 100%);
+  color:#fff;
+  border-radius:24px;
+  padding:22px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  box-shadow:0 6px 0 var(--accent-dark);
+}
+.hero .avatar{
+  width:56px;height:56px;border-radius:16px;
+  background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;flex-shrink:0;
+}
+.hero h1{margin:0 0 2px;font-size:22px;color:#fff;}
+.hero p{margin:0;font-size:13.5px;opacity:.9;}
+
+.section-title{
+  font-size:13px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--text-muted);
+  margin:4px 2px 0;
+}
+
+.path{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.unit-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  position:relative;
+  transition:transform .12s ease;
+}
+.unit-card:active{transform:scale(.98);}
+.unit-card.locked{opacity:.55;cursor:not-allowed;}
+.unit-badge{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0;
+  background:var(--accent-soft);
+  color:var(--accent);
+  border:2px solid var(--border);
+}
+.unit-card.done .unit-badge{background:var(--success-soft);color:var(--success);border-color:var(--success);}
+.unit-card.current .unit-badge{background:var(--accent);color:#fff;border-color:var(--accent-dark);}
+.unit-info{flex:1;min-width:0;}
+.unit-info h3{margin:0 0 3px;font-size:16.5px;}
+.unit-info p{margin:0;font-size:12.5px;color:var(--text-muted);}
+.unit-chevron{color:var(--text-muted);font-size:20px;}
+.mini-progress{
+  position:absolute;left:16px;right:16px;bottom:8px;
+  height:5px;background:var(--surface-2);border-radius:999px;overflow:hidden;
+}
+.mini-progress i{display:block;height:100%;background:var(--success);}
+
+/* ---------- Exercise screen ---------- */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+.prompt-kicker{
+  font-size:12px;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;
+}
+.prompt{font-size:19px;font-weight:700;margin:0 0 4px;font-family:'Baloo 2',sans-serif;}
+.prompt-sub{font-size:14px;color:var(--text-muted);margin:0 0 16px;}
+
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice{
+  border:2px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  border-radius:14px;
+  padding:13px 16px;
+  font-size:15.5px;
+  font-weight:600;
+  text-align:left;
+  cursor:pointer;
+  font-family:inherit;
+  transition:border-color .12s, background .12s, transform .08s;
+}
+.choice:hover{border-color:var(--accent);}
+.choice:active{transform:scale(.985);}
+.choice.selected{border-color:var(--accent);background:var(--accent-soft);}
+.choice.correct{border-color:var(--success);background:var(--success-soft);color:var(--success);}
+.choice.wrong{border-color:var(--error);background:var(--error-soft);color:var(--error);}
+.choice[disabled]{cursor:default;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.match-cols{display:flex;gap:10px;}
+.match-col{flex:1;display:flex;flex-direction:column;gap:8px;}
+.match-item{
+  border:2px solid var(--border);
+  background:var(--surface);
+  border-radius:12px;
+  padding:11px 10px;
+  font-size:14px;
+  font-weight:600;
+  text-align:center;
+  cursor:pointer;
+  min-height:44px;
+  display:flex;align-items:center;justify-content:center;
+}
+.match-item.selected{border-color:var(--accent);background:var(--accent-soft);}
+.match-item.matched{border-color:var(--success);background:var(--success-soft);color:var(--success);opacity:.7;cursor:default;}
+.match-item.wrongflash{border-color:var(--error);background:var(--error-soft);}
+
+.blank-input{
+  width:100%;
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:13px 16px;
+  font-size:16px;
+  font-family:inherit;
+  background:var(--surface);
+  color:var(--text);
+  margin-bottom:4px;
+}
+.blank-input:focus{outline:none;border-color:var(--accent);}
+.blank-input.correct{border-color:var(--success);background:var(--success-soft);}
+.blank-input.wrong{border-color:var(--error);background:var(--error-soft);}
+
+/* ---------- Bottom action bar ---------- */
+.bottom-bar{
+  position:sticky;
+  bottom:0;
+  padding-top:10px;
+  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(var(--bg-fade,transparent), var(--bg) 30%);
+}
+.btn{
+  width:100%;
+  border:none;
+  border-radius:16px;
+  padding:15px 20px;
+  font-size:16px;
+  font-weight:800;
+  font-family:'Baloo 2',sans-serif;
+  cursor:pointer;
+  letter-spacing:.02em;
+}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 0 var(--accent-dark);}
+.btn-primary:active{box-shadow:0 1px 0 var(--accent-dark);transform:translateY(3px);}
+.btn-primary:disabled{background:var(--surface-2);color:var(--text-muted);box-shadow:none;cursor:not-allowed;}
+.btn-success{background:var(--success);color:#fff;box-shadow:0 4px 0 #158247;}
+.btn-error{background:var(--error);color:#fff;box-shadow:0 4px 0 #b7203c;}
+.btn-ghost{background:none;color:var(--accent);box-shadow:none;text-decoration:underline;padding:8px;}
+
+.feedback-panel{
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:10px;
+}
+.feedback-panel.ok{background:var(--success-soft);color:var(--success);}
+.feedback-panel.ko{background:var(--error-soft);color:var(--error);}
+.feedback-panel .emoji{font-size:24px;}
+.feedback-panel .fb-title{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;margin:0 0 3px;}
+.feedback-panel .fb-text{font-size:13.5px;margin:0;color:var(--text);opacity:.85;}
+
+/* ---------- Result screen ---------- */
+.result-wrap{text-align:center;padding:20px 6px;}
+.result-emoji{font-size:64px;margin-bottom:6px;}
+.result-stats{display:flex;justify-content:center;gap:10px;margin:18px 0;}
+.stat-pill{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px 16px;
+  min-width:84px;
+}
+.stat-pill .num{font-family:'Baloo 2',sans-serif;font-size:22px;font-weight:800;display:block;}
+.stat-pill .lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;}
+
+.hidden{display:none!important;}
+
+.hearts-lost-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:2px;}
+</style>
+
+<div id="app"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   CONTENT — English Unit 1, "My Friends and I" (Gaspard, 4e/2e degré)
+   Sourced from: personality adjectives, relationships vocab,
+   friendship idioms, family vocab, present perfect vs past simple,
+   for/since, expressing purpose (to / in order to / so as to).
+   ============================================================ */
+
+const UNITS = [
+  {
+    id: "personality",
+    title: "Personality",
+    icon: "🧠",
+    blurb: "Adjectives to describe someone's character",
+    exercises: buildPersonalityExercises()
+  },
+  {
+    id: "opposites",
+    title: "Opposites",
+    icon: "⚖️",
+    blurb: "Positive & negative character traits",
+    exercises: buildOppositesExercises()
+  },
+  {
+    id: "friends-vocab",
+    title: "Friends & Relationships",
+    icon: "🤝",
+    blurb: "BFF, mate, acquaintance... and phrases",
+    exercises: buildFriendsExercises()
+  },
+  {
+    id: "idioms",
+    title: "Friendship Idioms",
+    icon: "💬",
+    blurb: "Bury the hatchet, see eye to eye...",
+    exercises: buildIdiomsExercises()
+  },
+  {
+    id: "family",
+    title: "Family",
+    icon: "👪",
+    blurb: "Widow, elder, twins, in-laws...",
+    exercises: buildFamilyExercises()
+  },
+  {
+    id: "grammar-tenses",
+    title: "Grammar: Present Perfect vs Past Simple",
+    icon: "⏳",
+    blurb: "Choose the right tense",
+    exercises: buildTenseExercises()
+  },
+  {
+    id: "grammar-forsince",
+    title: "Grammar: FOR / SINCE",
+    icon: "🕰️",
+    blurb: "Duration vs starting point",
+    exercises: buildForSinceExercises()
+  },
+  {
+    id: "grammar-purpose",
+    title: "Grammar: Expressing Purpose",
+    icon: "🎯",
+    blurb: "to / in order to / so as to (never 'for + V')",
+    exercises: buildPurposeExercises()
+  }
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pick(arr,n){ return shuffle(arr).slice(0,n); }
+function mcq(prompt, sub, correct, distractors, opts){
+  opts = opts || {};
+  return {
+    type:"mcq", prompt, sub, correct,
+    options: shuffle([correct].concat(distractors)),
+    explain: opts.explain || ""
+  };
+}
+function typed(prompt, sub, answers, opts){
+  opts = opts || {};
+  return { type:"typed", prompt, sub, answers: Array.isArray(answers)?answers:[answers], explain: opts.explain||"" };
+}
+function match(prompt, pairs, opts){
+  opts = opts || {};
+  return { type:"match", prompt, pairs, explain: opts.explain||"" };
+}
+
+/* ---------- 1. Personality adjectives (meaning matching) ---------- */
+function buildPersonalityExercises(){
+  const defs = [
+    ["confident","feeling sure about yourself and your abilities"],
+    ["shy","not confident, especially about meeting new people"],
+    ["reliable","can be trusted to do what people expect you to do"],
+    ["hard-working","putting a lot of effort into your work"],
+    ["patient","able to stay calm and not get angry when things take time"],
+    ["impatient","not able to wait calmly; gets annoyed by delays"],
+    ["sensible","practical; doesn't do stupid things"],
+    ["creative","good at thinking of new ideas and using imagination"],
+    ["talented","has a natural ability for something"],
+    ["tolerant","able to accept differences in other people"],
+    ["headstrong","determined to do things your own way"],
+    ["caring","kind and concerned about other people's feelings"]
+  ];
+  const ex = [];
+  defs.forEach(([word,def])=>{
+    const distractors = pick(defs.filter(d=>d[0]!==word).map(d=>d[1]), 3);
+    ex.push(mcq(`What does "${word}" mean?`, "Choose the correct definition.", def, distractors));
+  });
+  // reverse direction: definition -> word
+  pick(defs, 6).forEach(([word,def])=>{
+    const distractors = pick(defs.filter(d=>d[0]!==word).map(d=>d[0]), 3);
+    ex.push(mcq(`"${def}"`, "Which adjective matches this definition?", word, distractors));
+  });
+  // matching round
+  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  // fill the blank
+  const fillBank = [
+    ["My sister can't wait for anything; she's so ____.", ["impatient"]],
+    ["I get very ____ before exams; I need to relax more.", ["nervous","anxious"]],
+    ["He's so ____, I could paint as well as your brother.", ["creative"]],
+    ["Adeline hasn't done a thing since she's here. She's so ____.", ["lazy"]],
+    ["I always have a laugh with my cousin, he's got a great sense of ____.", ["humour"]],
+    ["My younger sister understands new ideas so quickly; she's very ____.", ["clever","intelligent"]],
+    ["If Sarah says she'll do it, she'll do it. I ____ her completely.", ["trust"]],
+    ["He failed his exams, but he isn't ____. He just didn't work.", ["stupid"]]
+  ];
+  fillBank.forEach(([q,answers])=> ex.push(typed(q,"Type the missing word.",answers)));
+  return shuffle(ex);
+}
+
+/* ---------- 2. Opposites ---------- */
+function buildOppositesExercises(){
+  const pairs = [
+    ["generous","mean"],
+    ["honest","dishonest"],
+    ["clever","stupid"],
+    ["calm","nervous"],
+    ["kind","unkind"],
+    ["friendly","unfriendly"],
+    ["pleasant","unpleasant"],
+    ["patient","impatient"],
+    ["reliable","unreliable"]
+  ];
+  const ex = [];
+  pairs.forEach(([pos,neg])=>{
+    const distractors = pick(pairs.filter(p=>p[1]!==neg).map(p=>p[1]),3);
+    ex.push(mcq(`What is the opposite of "${pos}"?`,"Choose the correct word.", neg, distractors));
+  });
+  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n])=>({left:p,right:n}))));
+  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n])=>({left:p,right:n}))));
+  const prefixBank = [
+    ["kind → ____kind", "unkind"],
+    ["friendly → ____friendly", "unfriendly"],
+    ["____pleasant (opposite of pleasant)", "unpleasant"],
+    ["____patient (opposite of patient)", "impatient"],
+    ["____honest (opposite of honest)", "dishonest"],
+    ["____reliable (opposite of reliable)", "unreliable"]
+  ];
+  prefixBank.forEach(([q,a])=> ex.push(typed(q,"Write the opposite using the correct prefix (un-/im-/dis-).",[a])));
+  return shuffle(ex);
+}
+
+/* ---------- 3. Friends & relationships vocab ---------- */
+function buildFriendsExercises(){
+  const defs = [
+    ["BFF","best friend forever"],
+    ["mate","friend (British/Australian slang)"],
+    ["buddy","friend (American slang)"],
+    ["acquaintance","a person you have met but don't know well"],
+    ["colleague","a person you work with"],
+    ["flatmate","a person you share a flat with (UK)"],
+    ["roommate","a person you share a room/flat with (US)"],
+    ["housemate","a person you share a house with"],
+    ["get on well with","to have a good relationship with someone"],
+    ["fall out with","to argue and stop being friends with someone"],
+    ["make it up","to be friends again after an argument"],
+    ["see eye to eye","to agree with someone"],
+    ["make friends","to become friends with someone (NOT 'get/find friends')"],
+    ["get together","to start a romantic relationship"]
+  ];
+  const ex = [];
+  defs.forEach(([w,d])=>{
+    const distractors = pick(defs.filter(x=>x[1]!==d).map(x=>x[1]),3);
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+  });
+  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(mcq("Rosie and Matt don't ____ eye to eye.","Complete the common mistake correction.", "see", ["get on","fall out","look"]));
+  ex.push(mcq("It's often difficult to ____ new friends when you move to another city.","Common mistake: choose the correct verb.", "make", ["get","find","take"]));
+  ex.push(typed("We had a quarrel but now we've ____ ____.", "Fill in the phrasal verb meaning 'became friends again' (2 words).", ["made it up","made up"]));
+  ex.push(typed("Jack and Amelia don't ____ ____ ____ ____ (often argue/disagree).", "Fill in the idiom (4 words).", ["see eye to eye"]));
+  return shuffle(ex);
+}
+
+/* ---------- 4. Friendship idioms ---------- */
+function buildIdiomsExercises(){
+  const idioms = [
+    ["a shoulder to cry on","someone who listens to your problems"],
+    ["see eye to eye","to agree with someone"],
+    ["hate someone's guts","to very strongly dislike someone"],
+    ["clear the air","to talk about a problem you've been avoiding"],
+    ["bury the hatchet","to stop fighting or quarrelling"],
+    ["patch up our differences","to settle an argument"],
+    ["through thick and thin","friends who share good times and difficult times together"],
+    ["a fair-weather friend","a friend who is only there when things go well for you"]
+  ];
+  const ex = [];
+  idioms.forEach(([w,d])=>{
+    const distractors = pick(idioms.filter(x=>x[1]!==d).map(x=>x[1]),3);
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+  });
+  idioms.forEach(([w,d])=>{
+    const distractors = pick(idioms.filter(x=>x[0]!==w).map(x=>x[0]),3);
+    ex.push(mcq(`"${d}"`,"Which idiom matches this definition?", w, distractors));
+  });
+  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d])=>({left:w,right:d}))));
+  return shuffle(ex);
+}
+
+/* ---------- 5. Family vocab ---------- */
+function buildFamilyExercises(){
+  const defs = [
+    ["widow","a woman whose husband has died"],
+    ["stepfather","the man who is married to your mother but is not your father"],
+    ["elder","older (used for brothers/sisters)"],
+    ["twins","two children born to one mother at the same time"],
+    ["close family","a family who like each other and stay together a lot"],
+    ["only child","someone without brothers or sisters"],
+    ["cousin","the child of your uncle or aunt"],
+    ["nephew","the son of your brother or sister"],
+    ["niece","the daughter of your brother or sister"],
+    ["sister-in-law","your brother's wife, or your husband's/wife's sister"],
+    ["get on well with","to have a good relationship with"],
+    ["altogether","in total"],
+    ["remarried","got married again"],
+    ["current","the one you have now (e.g. current girlfriend)"],
+    ["ex-","prefix for a relationship you had in the past but not anymore"]
+  ];
+  const ex = [];
+  defs.forEach(([w,d])=>{
+    const distractors = pick(defs.filter(x=>x[1]!==d).map(x=>x[1]),3);
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+  });
+  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(typed("Simon died two years ago, so Cath is a ____.", "Type the missing word.", ["widow"]));
+  ex.push(typed("Tom is Leyla's ____ brother (he is older).", "Type the missing word.", ["elder"]));
+  ex.push(typed("Emily has no brothers or sisters, so she's an ____ ____.", "Type the missing 2-word phrase.", ["only child"]));
+  ex.push(typed("Your ____ boyfriend is the one you have now (not an ex).", "Type the missing word.", ["current"]));
+  ex.push(mcq("It's more natural to say...","Common mistake: choose the correct form.", "Thomas's wife", ["the wife of Thomas","the Thomas's wife","wife of the Thomas"]));
+  return shuffle(ex);
+}
+
+/* ---------- 6. Grammar: present perfect vs past simple ---------- */
+function buildTenseExercises(){
+  const ex = [];
+  const items = [
+    {sentence:"I ____ (know) Rebecca for a long time.", answer:"have known", distractors:["knew","did know","have know"], explain:"Unfinished duration up to now → present perfect."},
+    {sentence:"We ____ (meet) at a friend's birthday party five years ago.", answer:"met", distractors:["have met","have meet","did met"], explain:"'Five years ago' is a finished time in the past → past simple."},
+    {sentence:"Last year, Rebecca's father ____ (change) his job.", answer:"changed", distractors:["has changed","have changed","was changed"], explain:"'Last year' = finished past time → past simple."},
+    {sentence:"Since then, we ____ (not/see) each other very much.", answer:"haven't seen", distractors:["didn't see","haven't see","don't see"], explain:"'Since then' connects the past to now → present perfect."},
+    {sentence:"Brad Pitt and Angelina Jolie ____ (donate) $1,000,000 when they launched their foundation.", answer:"donated", distractors:["have donated","has donated","did donated"], explain:"A specific finished past event → past simple."},
+    {sentence:"The RSPCA ____ (take care of) animals since 1824.", answer:"has taken care of", distractors:["took care of","is taking care of","take care of"], explain:"'Since 1824' → action continuing to now → present perfect."},
+    {sentence:"We ____ (never/organize) a Red Nose Day in my school so far.", answer:"have never organized", distractors:["never organized","didn't organized","never organize"], explain:"'So far' signals present perfect."},
+    {sentence:"Every 15 seconds a person dies from TB. Damian Action ____ (help) fight this disease since 1964.", answer:"has helped", distractors:["helped","help","was helping"], explain:"'Since 1964' → present perfect."},
+    {sentence:"She was born in Hawaii but she ____ (grow up) in Sydney.", answer:"grew up", distractors:["has grown up","have grown up","was grow up"], explain:"Completed single past event → past simple."},
+    {sentence:"She first appeared on stage when she ____ (be) five.", answer:"was", distractors:["has been","have been","were"], explain:"'When she was five' = specific past moment → past simple."},
+    {sentence:"She has been an actress ever ____.", answer:"since", distractors:["for","ago","when"], explain:"'Ever since' pairs with present perfect."},
+    {sentence:"Guess what! I ____ (meet) a wonderful man. We ____ (go) to the cinema together last night.", answer:"have met / went", distractors:["met / have gone","have met / have gone","met / went"], explain:"News announced now = present perfect; specific past detail ('last night') = past simple."}
+  ];
+  items.forEach(it=>{
+    ex.push(mcq(it.sentence, "Choose the correct verb form.", it.answer, it.distractors, {explain:it.explain}));
+  });
+  return shuffle(ex);
+}
+
+/* ---------- 7. Grammar: for / since ---------- */
+function buildForSinceExercises(){
+  const items = [
+    ["Music for Relief have given over $5,000,000 in donations ____ their beginnings in 2005.","since"],
+    ["My school has been involved in numerous charities ____ more than ten years now.","for"],
+    ["Ben has never had a relapse ____ he left hospital.","since"],
+    ["Jane Goodall has taken action on behalf of endangered species ____ more than 50 years.","for"],
+    ["I have known my friend Rebecca ____ a long time.","for"],
+    ["We haven't seen each other very much ____ then.","since"],
+    ["She has been an actress ____ she was five.","since"],
+    ["They have been friends ____ 20 years.","for"]
+  ];
+  const ex = items.map(([sentence,answer])=> mcq(sentence,"FOR (duration) or SINCE (starting point)?", answer, [answer==="for"?"since":"for"], {explain: answer==="for" ? "FOR + a length of time (e.g. 'for 10 years')." : "SINCE + a starting point in time (e.g. 'since 2005', 'since I left')."}));
+  items.forEach(([sentence,answer])=> ex.push(typed(sentence.replace("____","____"),"Type FOR or SINCE.",[answer])));
+  return shuffle(ex);
+}
+
+/* ---------- 8. Grammar: expressing purpose ---------- */
+function buildPurposeExercises(){
+  const ex = [];
+  ex.push(mcq("They organized a baseball match ____ raise funds to help the homeless.","Choose the correct way to express purpose.", "in order to", ["for to","for","for raise"], {explain:"Never use FOR + verb to express purpose. Use to / in order to / so as to."}));
+  ex.push(mcq("We held this charity sale ____ raise funds for school children in Africa.","Choose the correct option.", "to", ["for","for to","for raising"], {explain:"'To + verb' is the simplest way to express purpose."}));
+  ex.push(mcq("We chose a school in Africa ____ help underprivileged kids get an education.","Choose the correct option.", "so as to", ["for","for to","in order for"], {explain:"'So as to + verb' also expresses purpose."}));
+  ex.push(mcq("Which structure is WRONG to express purpose?","Spot the mistake.", "for + verb", ["to + verb","in order to + verb","so as to + verb"], {explain:"'FOR' is never followed directly by a verb to express purpose in English."}));
+  ex.push(typed("They practised every day ____ ____ improve their English. (2 words)","Complete with a purpose structure.",["in order","so as"]));
+  ex.push(mcq("We chose to speak directly to the media ____ reach as many people as possible.","Choose the correct option.", "to", ["for","for to","for reaching"], {explain:"'To + verb' expresses the goal of the action."}));
+  return shuffle(ex);
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const STORAGE_KEY = "friendsly_progress_v1";
+
+function loadState(){
+  let saved = {};
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) saved = JSON.parse(raw);
+  }catch(e){}
+  return Object.assign({
+    completedUnits:{}, // unitId -> {stars, bestScore}
+    streak: 0,
+    lastPlayedDate: null,
+    totalXP: 0
+  }, saved);
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+let state = loadState();
+
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+function registerPlaySession(){
+  const today = todayStr();
+  if(state.lastPlayedDate === today) return;
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(state.lastPlayedDate === yesterday){
+    state.streak += 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastPlayedDate = today;
+  saveState();
+}
+
+/* ============================================================
+   RENDER — router
+   ============================================================ */
+const app = document.getElementById("app");
+let session = null; // active exercise session
+
+function render(){
+  const hash = location.hash.replace("#","");
+  if(hash.startsWith("play-")){
+    const unitId = hash.replace("play-","");
+    const unit = UNITS.find(u=>u.id===unitId);
+    if(unit) return renderPlay(unit);
+  }
+  renderHome();
+}
+window.addEventListener("hashchange", render);
+
+function go(hash){ location.hash = hash; }
+
+/* ---------- HOME ---------- */
+function unitStars(unit){
+  const rec = state.completedUnits[unit.id];
+  if(!rec) return 0;
+  return rec.stars || 0;
+}
+
+function renderHome(){
+  session = null;
+  const totalStars = UNITS.reduce((s,u)=>s+unitStars(u),0);
+  const maxStars = UNITS.length*3;
+
+  const unitsHtml = UNITS.map((u,i)=>{
+    const stars = unitStars(u);
+    const done = stars>0;
+    const prevDone = i===0 || unitStars(UNITS[i-1])>0;
+    const locked = !done && !prevDone && i>0 && !state.unlockAll;
+    const cls = done ? "done" : (locked ? "locked" : "current");
+    const starsHtml = done ? `<span style="color:var(--gold);font-size:12px;">${"★".repeat(stars)}${"☆".repeat(3-stars)}</span>` : "";
+    return `
+      <div class="unit-card ${cls}" data-unit="${u.id}" ${locked?"":''}>
+        <div class="unit-badge">${u.icon}</div>
+        <div class="unit-info">
+          <h3>${u.title}</h3>
+          <p>${u.blurb} ${starsHtml}</p>
+        </div>
+        <div class="unit-chevron">${locked?"🔒":"›"}</div>
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="hero">
+      <div class="avatar">🐿️</div>
+      <div>
+        <h1>Friendsly</h1>
+        <p>My Friends and I — English Unit 1</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="stat-pill" style="flex:1;">
+        <span class="num">🔥 ${state.streak}</span>
+        <span class="lbl">Day streak</span>
+      </div>
+      <div class="stat-pill" style="flex:1;">
+        <span class="num">⭐ ${totalStars}/${maxStars}</span>
+        <span class="lbl">Stars</span>
+      </div>
+    </div>
+    <div class="section-title">Choose a mission</div>
+    <div class="path">${unitsHtml}</div>
+  `;
+
+  app.querySelectorAll(".unit-card").forEach(card=>{
+    card.addEventListener("click", ()=>{
+      if(card.classList.contains("locked")) return;
+      go("play-"+card.dataset.unit);
+    });
+  });
+}
+
+/* ---------- PLAY SESSION ---------- */
+const HEARTS_START = 5;
+const ROUND_SIZE_MAX = 10;
+
+function renderPlay(unit){
+  if(!session || session.unitId!==unit.id){
+    const pool = shuffle(unit.exercises).slice(0, Math.min(ROUND_SIZE_MAX, unit.exercises.length));
+    session = {
+      unitId: unit.id,
+      queue: pool,
+      idx: 0,
+      hearts: HEARTS_START,
+      correctCount: 0,
+      total: pool.length,
+      answered: false,
+      matchState: null
+    };
+  }
+  if(session.hearts<=0){ return renderFail(unit); }
+  if(session.idx >= session.queue.length){ return renderResult(unit); }
+
+  const item = session.queue[session.idx];
+  const progressPct = Math.round((session.idx/session.total)*100);
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+      <div class="stat hearts">♥ ${session.hearts}</div>
+    </div>
+    <div class="card" id="exercise-card"></div>
+    <div class="bottom-bar" id="bottom-bar"></div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>{
+    if(confirmless("Quit this mission? Your progress in this round will be lost.")) go("");
+  });
+
+  renderExercise(item, unit);
+}
+
+function confirmless(msg){
+  // confirm() is inert in this environment; just proceed (exit always allowed).
+  return true;
+}
+
+function renderExercise(item, unit){
+  const cardEl = document.getElementById("exercise-card");
+  const barEl = document.getElementById("bottom-bar");
+  session.answered = false;
+
+  if(item.type === "mcq"){
+    cardEl.innerHTML = `
+      <div class="prompt-kicker">${unit.title}</div>
+      <p class="prompt">${item.prompt}</p>
+      <p class="prompt-sub">${item.sub}</p>
+      <div class="choices">
+        ${item.options.map((opt,i)=>`<button class="choice" data-opt="${escapeAttr(opt)}">${opt}</button>`).join("")}
+      </div>
+    `;
+    barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
+    let selected = null;
+    cardEl.querySelectorAll(".choice").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(session.answered) return;
+        cardEl.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selected = btn.dataset.opt;
+        document.getElementById("btn-check").disabled = false;
+      });
+    });
+    document.getElementById("btn-check").addEventListener("click", ()=>{
+      if(!selected || session.answered) return;
+      const isCorrect = selected === item.correct;
+      session.answered = true;
+      cardEl.querySelectorAll(".choice").forEach(b=>{
+        b.disabled = true;
+        if(b.dataset.opt === item.correct) b.classList.add("correct");
+        else if(b.dataset.opt === selected) b.classList.add("wrong");
+      });
+      showFeedback(isCorrect, item, unit);
+    });
+
+  } else if(item.type === "typed"){
+    cardEl.innerHTML = `
+      <div class="prompt-kicker">${unit.title}</div>
+      <p class="prompt">${item.prompt}</p>
+      <p class="prompt-sub">${item.sub}</p>
+      <input type="text" class="blank-input" id="typed-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="off" spellcheck="false">
+    `;
+    barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
+    const input = document.getElementById("typed-input");
+    input.addEventListener("input", ()=>{
+      document.getElementById("btn-check").disabled = input.value.trim().length===0;
+    });
+    input.addEventListener("keydown", (e)=>{
+      if(e.key==="Enter" && !document.getElementById("btn-check").disabled) document.getElementById("btn-check").click();
+    });
+    setTimeout(()=>input.focus(), 50);
+    document.getElementById("btn-check").addEventListener("click", ()=>{
+      if(session.answered) return;
+      session.answered = true;
+      const val = input.value.trim().toLowerCase().replace(/\s+/g," ");
+      const isCorrect = item.answers.some(a=>a.toLowerCase()===val);
+      input.disabled = true;
+      input.classList.add(isCorrect?"correct":"wrong");
+      showFeedback(isCorrect, item, unit);
+    });
+
+  } else if(item.type === "match"){
+    const leftItems = shuffle(item.pairs.map((p,i)=>({id:"L"+i, text:p.left, pairId:i})));
+    const rightItems = shuffle(item.pairs.map((p,i)=>({id:"R"+i, text:p.right, pairId:i})));
+    session.matchState = { matched: new Set(), selectedLeft:null, selectedRight:null, mistakes:0, pairsCount:item.pairs.length };
+
+    cardEl.innerHTML = `
+      <div class="prompt-kicker">${unit.title}</div>
+      <p class="prompt">${item.prompt}</p>
+      <p class="prompt-sub">Tap one item on each side to match them.</p>
+      <div class="match-cols">
+        <div class="match-col" id="col-left">
+          ${leftItems.map(li=>`<button class="match-item" data-id="${li.id}" data-pair="${li.pairId}">${li.text}</button>`).join("")}
+        </div>
+        <div class="match-col" id="col-right">
+          ${rightItems.map(ri=>`<button class="match-item" data-id="${ri.id}" data-pair="${ri.pairId}">${ri.text}</button>`).join("")}
+        </div>
+      </div>
+    `;
+    barEl.innerHTML = `<button class="btn btn-primary" id="btn-continue" disabled>Continue</button>`;
+
+    function tryMatch(){
+      const ms = session.matchState;
+      if(ms.selectedLeft==null || ms.selectedRight==null) return;
+      const leftBtn = cardEl.querySelector(`.match-item[data-id="${ms.selectedLeft}"]`);
+      const rightBtn = cardEl.querySelector(`.match-item[data-id="${ms.selectedRight}"]`);
+      const leftPair = leftBtn.dataset.pair;
+      const rightPair = rightBtn.dataset.pair;
+      if(leftPair === rightPair){
+        leftBtn.classList.remove("selected");
+        rightBtn.classList.remove("selected");
+        leftBtn.classList.add("matched");
+        rightBtn.classList.add("matched");
+        ms.matched.add(leftPair);
+        ms.selectedLeft = null; ms.selectedRight = null;
+        if(ms.matched.size === ms.pairsCount){
+          document.getElementById("btn-continue").disabled = false;
+          const isCorrect = ms.mistakes===0;
+          session.answered = true;
+          showFeedback(isCorrect, item, unit, true);
+        }
+      } else {
+        ms.mistakes++;
+        leftBtn.classList.add("wrongflash");
+        rightBtn.classList.add("wrongflash");
+        setTimeout(()=>{
+          leftBtn.classList.remove("selected","wrongflash");
+          rightBtn.classList.remove("selected","wrongflash");
+        }, 450);
+        ms.selectedLeft = null; ms.selectedRight = null;
+      }
+    }
+
+    cardEl.querySelectorAll("#col-left .match-item").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const ms = session.matchState;
+        if(btn.classList.contains("matched")) return;
+        cardEl.querySelectorAll("#col-left .match-item").forEach(b=>b.classList.remove("selected"));
+        btn.classList.add("selected");
+        ms.selectedLeft = btn.dataset.id;
+        tryMatch();
+      });
+    });
+    cardEl.querySelectorAll("#col-right .match-item").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const ms = session.matchState;
+        if(btn.classList.contains("matched")) return;
+        cardEl.querySelectorAll("#col-right .match-item").forEach(b=>b.classList.remove("selected"));
+        btn.classList.add("selected");
+        ms.selectedRight = btn.dataset.id;
+        tryMatch();
+      });
+    });
+    document.getElementById("btn-continue").addEventListener("click", ()=> advance());
+  }
+}
+
+function escapeAttr(s){ return String(s).replace(/"/g,"&quot;"); }
+
+function showFeedback(isCorrect, item, unit, isMatch){
+  const barEl = document.getElementById("bottom-bar");
+  if(isCorrect){
+    session.correctCount++;
+  } else {
+    session.hearts = Math.max(0, session.hearts-1);
+  }
+  const panelClass = isCorrect ? "ok" : "ko";
+  const emoji = isCorrect ? "🎉" : "😿";
+  const title = isCorrect ? pickPraise() : "Not quite!";
+  let text = "";
+  if(!isCorrect){
+    if(item.type==="mcq") text = `Correct answer: <strong>${item.correct}</strong>.`;
+    else if(item.type==="typed") text = `Correct answer: <strong>${item.answers[0]}</strong>.`;
+    else text = "Some pairs were wrong — check them again next time.";
+  }
+  if(item.explain) text += (text?" ":"") + item.explain;
+
+  const heartsLostNote = (!isCorrect && session.hearts===0) ? `<p class="hearts-lost-note">Out of hearts...</p>` : "";
+
+  barEl.innerHTML = `
+    <div class="feedback-panel ${panelClass}">
+      <div class="emoji">${emoji}</div>
+      <div>
+        <p class="fb-title">${title}</p>
+        <p class="fb-text">${text}</p>
+      </div>
+    </div>
+    ${heartsLostNote}
+    <button class="btn ${isCorrect?'btn-success':'btn-error'}" id="btn-continue">Continue</button>
+  `;
+  document.getElementById("btn-continue").addEventListener("click", ()=> advance());
+}
+
+function pickPraise(){
+  return pick(["Nicely done!","Great job!","Excellent!","You've got it!","Perfect!"],1)[0];
+}
+
+function advance(){
+  session.idx++;
+  const unit = UNITS.find(u=>u.id===session.unitId);
+  if(session.hearts<=0){ renderFail(unit); return; }
+  render();
+}
+
+function renderFail(unit){
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--error);"></div></div>
+      <div class="stat hearts">♥ 0</div>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">😿</div>
+      <h2>Out of hearts!</h2>
+      <p style="color:var(--text-muted);">Don't worry, review the mistakes and try "${unit.title}" again.</p>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-primary" id="btn-retry">Try again</button>
+      <div style="height:8px;"></div>
+      <button class="btn btn-ghost" id="btn-home">Back to missions</button>
+    </div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>go(""));
+  document.getElementById("btn-home").addEventListener("click", ()=>go(""));
+  document.getElementById("btn-retry").addEventListener("click", ()=>{ session=null; go("play-"+unit.id); });
+}
+
+function renderResult(unit){
+  const pct = session.total>0 ? session.correctCount/session.total : 0;
+  let stars = 1;
+  if(pct>=0.95) stars = 3;
+  else if(pct>=0.75) stars = 2;
+  const prevStars = unitStars(unit);
+  if(stars > prevStars){
+    state.completedUnits[unit.id] = { stars, bestScore: session.correctCount };
+  } else if(!state.completedUnits[unit.id]){
+    state.completedUnits[unit.id] = { stars, bestScore: session.correctCount };
+  }
+  state.totalXP += session.correctCount * 10;
+  registerPlaySession();
+  saveState();
+
+  const starsHtml = `<div style="font-size:40px;letter-spacing:6px;">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>`;
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
+      <div class="stat hearts">♥ ${session.hearts}</div>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">🏆</div>
+      <h2>Mission complete!</h2>
+      ${starsHtml}
+      <div class="result-stats">
+        <div class="stat-pill">
+          <span class="num">${session.correctCount}/${session.total}</span>
+          <span class="lbl">Correct</span>
+        </div>
+        <div class="stat-pill">
+          <span class="num">+${session.correctCount*10}</span>
+          <span class="lbl">XP</span>
+        </div>
+        <div class="stat-pill">
+          <span class="num">🔥 ${state.streak}</span>
+          <span class="lbl">Streak</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-primary" id="btn-continue-home">Continue</button>
+    </div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>go(""));
+  document.getElementById("btn-continue-home").addEventListener("click", ()=>{ session=null; go(""); });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function start(hotData){
+  if(hotData && hotData.state) state = Object.assign(state, hotData.state);
+  render();
+}
+if(window.claude && window.claude.hot){
+  window.claude.hot.snapshot(()=>({ state }));
+  window.claude.hot.ready ? window.claude.hot.ready(start) : start(window.claude.hot.data||{});
+} else {
+  start({});
+}
+
+})();
+</script>

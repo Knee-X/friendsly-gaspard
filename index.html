@@ -741,9 +741,14 @@ function loadState(){
   }, saved);
 }
 function saveState(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  try{
+    const toSave = Object.assign({}, state);
+    delete toSave.unlockAll; // never persisted: parent mode resets when the page closes
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  }catch(e){}
 }
 let state = loadState();
+state.unlockAll = false; // parent mode always starts off; lives only in memory for this page load
 
 function todayStr(){
   return new Date().toISOString().slice(0,10);
@@ -854,6 +859,7 @@ function renderHome(){
   document.getElementById("btn-howto").addEventListener("click", showHowToModal);
   document.getElementById("btn-parent-toggle").addEventListener("click", ()=>{
     if(state.unlockAll){
+      state.unlockAll = false;
       renderHome();
     } else {
       showParentModal();
@@ -923,7 +929,7 @@ function showParentModal(){
     <ul>
       <li>Toutes les missions deviennent accessibles immédiatement.</li>
       <li>Les étoiles et la progression de l'élève ne sont <strong>pas modifiées</strong>.</li>
-      <li>Tu peux désactiver le mode parent à tout moment depuis l'accueil.</li>
+      <li>Le mode parent se désactive <strong>automatiquement</strong> dès que tu fermes ou recharges la page : pas besoin de penser à l'éteindre.</li>
     </ul>
     <p style="font-size:12.5px;color:var(--text-muted);margin:14px 0 16px;">Ce réglage est propre à cet appareil/navigateur : il ne change rien pour l'élève sur son propre téléphone.</p>
     <button class="btn btn-primary" id="btn-parent-confirm">Activer le mode parent</button>

@@ -325,6 +325,83 @@ h1,h2,h3,.display{font-family:'Baloo 2',system-ui,sans-serif;text-wrap:balance;}
 .hidden{display:none!important;}
 
 .hearts-lost-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:2px;}
+
+/* ---------- Home top row & modal ---------- */
+.home-toprow{display:flex;justify-content:flex-end;gap:8px;}
+.pill-btn{
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  border-radius:999px;
+  padding:7px 13px;
+  font-size:12.5px;
+  font-weight:700;
+  font-family:'Inter',sans-serif;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.pill-btn:hover{border-color:var(--accent);color:var(--accent);}
+.pill-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+
+.parent-banner{
+  background:var(--accent-soft);
+  border:1px dashed var(--accent);
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:12.5px;
+  color:var(--accent-dark);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.parent-banner button{
+  border:none;background:none;color:var(--accent-dark);
+  font-weight:700;text-decoration:underline;cursor:pointer;
+  font-size:12.5px;padding:2px;white-space:nowrap;
+  font-family:inherit;
+}
+
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(20,10,40,.45);
+  display:flex;align-items:flex-end;justify-content:center;
+  z-index:50;
+  padding:0;
+}
+@media (min-width:520px){
+  .modal-overlay{align-items:center;}
+}
+.modal-sheet{
+  background:var(--surface);
+  width:100%;max-width:480px;
+  border-radius:22px 22px 0 0;
+  padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  max-height:85vh;
+  overflow-y:auto;
+}
+@media (min-width:520px){
+  .modal-sheet{border-radius:22px;max-height:80vh;}
+}
+.modal-sheet h2{margin:0 0 4px;font-size:21px;}
+.modal-sheet .modal-sub{color:var(--text-muted);font-size:13.5px;margin:0 0 16px;}
+.modal-sheet h3{font-size:14.5px;margin:18px 0 8px;}
+.modal-sheet ol,.modal-sheet ul{margin:0;padding-left:20px;font-size:14px;line-height:1.55;}
+.modal-sheet li{margin-bottom:6px;}
+.modal-sheet .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.legend-chip{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface-2);border-radius:999px;
+  padding:6px 12px;font-size:12.5px;font-weight:600;
+}
+.modal-close-x{
+  position:absolute;top:14px;right:14px;
+  border:none;background:var(--surface-2);color:var(--text-muted);
+  width:32px;height:32px;border-radius:999px;font-size:16px;cursor:pointer;
+}
+.modal-sheet{position:relative;}
 </style>
 
 <div id="app"></div>
@@ -733,7 +810,18 @@ function renderHome(){
       </div>`;
   }).join("");
 
+  const parentActive = !!state.unlockAll;
+  const parentBanner = parentActive ? `
+    <div class="parent-banner">
+      <span>👀 Mode parent actif : toutes les missions sont déverrouillées pour tester.</span>
+      <button id="btn-parent-off">Désactiver</button>
+    </div>` : "";
+
   app.innerHTML = `
+    <div class="home-toprow">
+      <button class="pill-btn" id="btn-howto">❓ Mode d'emploi</button>
+      <button class="pill-btn ${parentActive?'active':''}" id="btn-parent-toggle">🔓 Mode parent</button>
+    </div>
     <div class="hero">
       <div class="avatar">🐿️</div>
       <div>
@@ -741,6 +829,7 @@ function renderHome(){
         <p>My Friends and I — English Unit 1</p>
       </div>
     </div>
+    ${parentBanner}
     <div style="display:flex;gap:10px;">
       <div class="stat-pill" style="flex:1;">
         <span class="num">🔥 ${state.streak}</span>
@@ -751,7 +840,7 @@ function renderHome(){
         <span class="lbl">Stars</span>
       </div>
     </div>
-    <div class="section-title">Choose a mission</div>
+    <div class="section-title">Choisis une mission</div>
     <div class="path">${unitsHtml}</div>
   `;
 
@@ -760,6 +849,89 @@ function renderHome(){
       if(card.classList.contains("locked")) return;
       go("play-"+card.dataset.unit);
     });
+  });
+
+  document.getElementById("btn-howto").addEventListener("click", showHowToModal);
+  document.getElementById("btn-parent-toggle").addEventListener("click", ()=>{
+    if(state.unlockAll){
+      renderHome();
+    } else {
+      showParentModal();
+    }
+  });
+  const parentOffBtn = document.getElementById("btn-parent-off");
+  if(parentOffBtn){
+    parentOffBtn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      state.unlockAll = false;
+      saveState();
+      renderHome();
+    });
+  }
+}
+
+/* ---------- Modals: how-to (FR) & parent mode ---------- */
+function openModal(innerHtml){
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `<div class="modal-sheet">${innerHtml}</div>`;
+  overlay.addEventListener("click", (e)=>{ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  const closeBtn = overlay.querySelector(".modal-close-x");
+  if(closeBtn) closeBtn.addEventListener("click", ()=> overlay.remove());
+  return overlay;
+}
+
+function showHowToModal(){
+  openModal(`
+    <button class="modal-close-x" aria-label="Fermer">✕</button>
+    <h2>🐿️ Mode d'emploi</h2>
+    <p class="modal-sub">Comment utiliser Friendsly pour réviser le chapitre "My Friends and I".</p>
+
+    <h3>1. Choisis une mission</h3>
+    <ol>
+      <li>Sur l'écran d'accueil, chaque carte est une <strong>mission</strong> (vocabulaire ou grammaire du chapitre).</li>
+      <li>Les missions se débloquent l'une après l'autre : termine la première pour ouvrir la suivante.</li>
+    </ol>
+
+    <h3>2. Réponds aux questions</h3>
+    <ul>
+      <li><strong>QCM</strong> : choisis la bonne réponse, puis appuie sur "Check".</li>
+      <li><strong>Texte à trous</strong> : tape le mot manquant et valide.</li>
+      <li><strong>Association</strong> : touche un mot à gauche puis sa définition à droite pour les relier.</li>
+    </ul>
+
+    <h3>3. Cœurs et étoiles</h3>
+    <div class="legend">
+      <span class="legend-chip">♥ 5 cœurs par mission</span>
+      <span class="legend-chip">😿 −1 cœur par erreur</span>
+      <span class="legend-chip">⭐ 1 à 3 étoiles selon le score</span>
+      <span class="legend-chip">🔥 1 flamme par jour joué</span>
+    </div>
+    <p style="font-size:13.5px;color:var(--text-muted);margin-top:10px;">Si les 5 cœurs sont perdus, la mission s'arrête : pas de panique, on peut toujours recommencer !</p>
+
+    <h3>4. Recommencer une mission</h3>
+    <p style="font-size:14px;margin:0;">Tu peux rejouer une mission déjà terminée pour améliorer ton score et gagner plus d'étoiles. Ta progression est sauvegardée automatiquement sur cet appareil.</p>
+  `);
+}
+
+function showParentModal(){
+  openModal(`
+    <button class="modal-close-x" aria-label="Fermer">✕</button>
+    <h2>🔓 Mode parent</h2>
+    <p class="modal-sub">Active ce mode pour tester toutes les missions librement, sans devoir les débloquer dans l'ordre.</p>
+    <ul>
+      <li>Toutes les missions deviennent accessibles immédiatement.</li>
+      <li>Les étoiles et la progression de l'élève ne sont <strong>pas modifiées</strong>.</li>
+      <li>Tu peux désactiver le mode parent à tout moment depuis l'accueil.</li>
+    </ul>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:14px 0 16px;">Ce réglage est propre à cet appareil/navigateur : il ne change rien pour l'élève sur son propre téléphone.</p>
+    <button class="btn btn-primary" id="btn-parent-confirm">Activer le mode parent</button>
+  `).querySelector("#btn-parent-confirm").addEventListener("click", ()=>{
+    state.unlockAll = true;
+    saveState();
+    document.querySelector(".modal-overlay").remove();
+    renderHome();
   });
 }
 

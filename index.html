@@ -402,6 +402,35 @@ h1,h2,h3,.display{font-family:'Baloo 2',system-ui,sans-serif;text-wrap:balance;}
   width:32px;height:32px;border-radius:999px;font-size:16px;cursor:pointer;
 }
 .modal-sheet{position:relative;}
+
+/* ---------- Translation toggle & hints ---------- */
+.translation-hint{
+  margin-top:10px;
+  background:var(--surface-2);
+  border-left:3px solid var(--accent);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:13.5px;
+  color:var(--text);
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+}
+.translation-hint .flag{flex-shrink:0;}
+.match-item .item-fr{
+  display:block;
+  font-size:10.5px;
+  font-weight:500;
+  color:var(--text-muted);
+  margin-top:2px;
+}
+.choice .opt-fr{
+  display:block;
+  font-size:11.5px;
+  font-weight:500;
+  color:var(--text-muted);
+  margin-top:2px;
+}
 </style>
 
 <div id="app"></div>
@@ -490,183 +519,192 @@ function mcq(prompt, sub, correct, distractors, opts){
   return {
     type:"mcq", prompt, sub, correct,
     options: shuffle([correct].concat(distractors)),
-    explain: opts.explain || ""
+    explain: opts.explain || "",
+    fr: opts.fr || null,          // French translation of the prompt/sentence
+    optionsFr: opts.optionsFr || null // map: english option -> French translation
   };
 }
 function typed(prompt, sub, answers, opts){
   opts = opts || {};
-  return { type:"typed", prompt, sub, answers: Array.isArray(answers)?answers:[answers], explain: opts.explain||"" };
+  return { type:"typed", prompt, sub, answers: Array.isArray(answers)?answers:[answers], explain: opts.explain||"", fr: opts.fr || null };
 }
 function match(prompt, pairs, opts){
   opts = opts || {};
-  return { type:"match", prompt, pairs, explain: opts.explain||"" };
+  // pairs: [{left, right, leftFr?, rightFr?}]
+  return { type:"match", prompt, pairs, explain: opts.explain||"", fr: opts.fr || null };
 }
 
 /* ---------- 1. Personality adjectives (meaning matching) ---------- */
 function buildPersonalityExercises(){
+  // [english word, english definition, french translation of the word]
   const defs = [
-    ["confident","feeling sure about yourself and your abilities"],
-    ["shy","not confident, especially about meeting new people"],
-    ["reliable","can be trusted to do what people expect you to do"],
-    ["hard-working","putting a lot of effort into your work"],
-    ["patient","able to stay calm and not get angry when things take time"],
-    ["impatient","not able to wait calmly; gets annoyed by delays"],
-    ["sensible","practical; doesn't do stupid things"],
-    ["creative","good at thinking of new ideas and using imagination"],
-    ["talented","has a natural ability for something"],
-    ["tolerant","able to accept differences in other people"],
-    ["headstrong","determined to do things your own way"],
-    ["caring","kind and concerned about other people's feelings"]
+    ["confident","feeling sure about yourself and your abilities","confiant(e)"],
+    ["shy","not confident, especially about meeting new people","timide"],
+    ["reliable","can be trusted to do what people expect you to do","fiable"],
+    ["hard-working","putting a lot of effort into your work","travailleur/travailleuse"],
+    ["patient","able to stay calm and not get angry when things take time","patient(e)"],
+    ["impatient","not able to wait calmly; gets annoyed by delays","impatient(e)"],
+    ["sensible","practical; doesn't do stupid things","raisonnable, sensé(e)"],
+    ["creative","good at thinking of new ideas and using imagination","créatif/créative"],
+    ["talented","has a natural ability for something","talentueux/talentueuse"],
+    ["tolerant","able to accept differences in other people","tolérant(e)"],
+    ["headstrong","determined to do things your own way","têtu(e)"],
+    ["caring","kind and concerned about other people's feelings","attentionné(e)"]
   ];
   const ex = [];
-  defs.forEach(([word,def])=>{
+  defs.forEach(([word,def,fr])=>{
     const distractors = pick(defs.filter(d=>d[0]!==word).map(d=>d[1]), 3);
-    ex.push(mcq(`What does "${word}" mean?`, "Choose the correct definition.", def, distractors));
+    ex.push(mcq(`What does "${word}" mean?`, "Choose the correct definition.", def, distractors, {fr:`Que veut dire "${word}" (${fr}) ?`}));
   });
   // reverse direction: definition -> word
-  pick(defs, 6).forEach(([word,def])=>{
+  pick(defs, 6).forEach(([word,def,fr])=>{
     const distractors = pick(defs.filter(d=>d[0]!==word).map(d=>d[0]), 3);
-    ex.push(mcq(`"${def}"`, "Which adjective matches this definition?", word, distractors));
+    ex.push(mcq(`"${def}"`, "Which adjective matches this definition?", word, distractors, {fr:`Quel adjectif correspond à : "${def}" ? (réponse : ${fr})`}));
   });
   // matching round
-  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
+  const frMap = Object.fromEntries(defs.map(([w,d,fr])=>[w,fr]));
+  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque adjectif à sa définition."}));
+  ex.push(match("Match each adjective to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque adjectif à sa définition."}));
   // fill the blank
   const fillBank = [
-    ["My sister can't wait for anything; she's so ____.", ["impatient"]],
-    ["I get very ____ before exams; I need to relax more.", ["nervous","anxious"]],
-    ["He's so ____, I could paint as well as your brother.", ["creative"]],
-    ["Adeline hasn't done a thing since she's here. She's so ____.", ["lazy"]],
-    ["I always have a laugh with my cousin, he's got a great sense of ____.", ["humour"]],
-    ["My younger sister understands new ideas so quickly; she's very ____.", ["clever","intelligent"]],
-    ["If Sarah says she'll do it, she'll do it. I ____ her completely.", ["trust"]],
-    ["He failed his exams, but he isn't ____. He just didn't work.", ["stupid"]]
+    ["My sister can't wait for anything; she's so ____.", ["impatient"], "Ma sœur ne peut rien attendre ; elle est tellement ____ (impatiente)."],
+    ["I get very ____ before exams; I need to relax more.", ["nervous","anxious"], "Je deviens très ____ (nerveux) avant les examens ; je dois me détendre davantage."],
+    ["He's so ____, I could paint as well as your brother.", ["creative"], "Il est tellement ____ (créatif), je pourrais peindre aussi bien que ton frère."],
+    ["Adeline hasn't done a thing since she's here. She's so ____.", ["lazy"], "Adeline n'a rien fait depuis qu'elle est là. Elle est tellement ____ (paresseuse)."],
+    ["I always have a laugh with my cousin, he's got a great sense of ____.", ["humour"], "Je rigole toujours avec mon cousin, il a un grand sens de l'____ (humour)."],
+    ["My younger sister understands new ideas so quickly; she's very ____.", ["clever","intelligent"], "Ma petite sœur comprend les nouvelles idées si vite ; elle est très ____ (intelligente)."],
+    ["If Sarah says she'll do it, she'll do it. I ____ her completely.", ["trust"], "Si Sarah dit qu'elle le fera, elle le fera. Je lui fais totalement ____ (confiance)."],
+    ["He failed his exams, but he isn't ____. He just didn't work.", ["stupid"], "Il a raté ses examens, mais il n'est pas ____ (stupide). Il n'a juste pas travaillé."]
   ];
-  fillBank.forEach(([q,answers])=> ex.push(typed(q,"Type the missing word.",answers)));
+  fillBank.forEach(([q,answers,fr])=> ex.push(typed(q,"Type the missing word.",answers,{fr})));
   return shuffle(ex);
 }
 
 /* ---------- 2. Opposites ---------- */
 function buildOppositesExercises(){
+  // [positive, negative, positive FR, negative FR]
   const pairs = [
-    ["generous","mean"],
-    ["honest","dishonest"],
-    ["clever","stupid"],
-    ["calm","nervous"],
-    ["kind","unkind"],
-    ["friendly","unfriendly"],
-    ["pleasant","unpleasant"],
-    ["patient","impatient"],
-    ["reliable","unreliable"]
+    ["generous","mean","généreux/généreuse","radin(e), mesquin(e)"],
+    ["honest","dishonest","honnête","malhonnête"],
+    ["clever","stupid","intelligent(e)","stupide"],
+    ["calm","nervous","calme","nerveux/nerveuse"],
+    ["kind","unkind","gentil(le)","méchant(e)"],
+    ["friendly","unfriendly","amical(e)","peu amical(e)"],
+    ["pleasant","unpleasant","agréable","désagréable"],
+    ["patient","impatient","patient(e)","impatient(e)"],
+    ["reliable","unreliable","fiable","peu fiable"]
   ];
   const ex = [];
-  pairs.forEach(([pos,neg])=>{
+  pairs.forEach(([pos,neg,posFr,negFr])=>{
     const distractors = pick(pairs.filter(p=>p[1]!==neg).map(p=>p[1]),3);
-    ex.push(mcq(`What is the opposite of "${pos}"?`,"Choose the correct word.", neg, distractors));
+    ex.push(mcq(`What is the opposite of "${pos}"?`,"Choose the correct word.", neg, distractors, {fr:`Quel est le contraire de "${pos}" (${posFr}) ? (réponse : ${negFr})`}));
   });
-  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n])=>({left:p,right:n}))));
-  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n])=>({left:p,right:n}))));
+  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n,pFr,nFr])=>({left:p,right:n,leftFr:pFr,rightFr:nFr})), {fr:"Associe chaque adjectif positif à son contraire."}));
+  ex.push(match("Match the positive adjective to its opposite.", pick(pairs,4).map(([p,n,pFr,nFr])=>({left:p,right:n,leftFr:pFr,rightFr:nFr})), {fr:"Associe chaque adjectif positif à son contraire."}));
   const prefixBank = [
-    ["kind → ____kind", "unkind"],
-    ["friendly → ____friendly", "unfriendly"],
-    ["____pleasant (opposite of pleasant)", "unpleasant"],
-    ["____patient (opposite of patient)", "impatient"],
-    ["____honest (opposite of honest)", "dishonest"],
-    ["____reliable (opposite of reliable)", "unreliable"]
+    ["kind → ____kind", "unkind", "gentil → mal____ (le contraire)"],
+    ["friendly → ____friendly", "unfriendly", "amical → peu ____ (le contraire)"],
+    ["____pleasant (opposite of pleasant)", "unpleasant", "____agréable (le contraire d'agréable)"],
+    ["____patient (opposite of patient)", "impatient", "____patient (le contraire de patient)"],
+    ["____honest (opposite of honest)", "dishonest", "____honnête (le contraire d'honnête)"],
+    ["____reliable (opposite of reliable)", "unreliable", "____fiable (le contraire de fiable)"]
   ];
-  prefixBank.forEach(([q,a])=> ex.push(typed(q,"Write the opposite using the correct prefix (un-/im-/dis-).",[a])));
+  prefixBank.forEach(([q,a,fr])=> ex.push(typed(q,"Write the opposite using the correct prefix (un-/im-/dis-).",[a],{fr})));
   return shuffle(ex);
 }
 
 /* ---------- 3. Friends & relationships vocab ---------- */
 function buildFriendsExercises(){
+  // [english, english definition, french translation]
   const defs = [
-    ["BFF","best friend forever"],
-    ["mate","friend (British/Australian slang)"],
-    ["buddy","friend (American slang)"],
-    ["acquaintance","a person you have met but don't know well"],
-    ["colleague","a person you work with"],
-    ["flatmate","a person you share a flat with (UK)"],
-    ["roommate","a person you share a room/flat with (US)"],
-    ["housemate","a person you share a house with"],
-    ["get on well with","to have a good relationship with someone"],
-    ["fall out with","to argue and stop being friends with someone"],
-    ["make it up","to be friends again after an argument"],
-    ["see eye to eye","to agree with someone"],
-    ["make friends","to become friends with someone (NOT 'get/find friends')"],
-    ["get together","to start a romantic relationship"]
+    ["BFF","best friend forever","meilleur(e) ami(e) pour la vie"],
+    ["mate","friend (British/Australian slang)","pote (argot britannique/australien)"],
+    ["buddy","friend (American slang)","pote (argot américain)"],
+    ["acquaintance","a person you have met but don't know well","une connaissance"],
+    ["colleague","a person you work with","un(e) collègue"],
+    ["flatmate","a person you share a flat with (UK)","un(e) colocataire (UK)"],
+    ["roommate","a person you share a room/flat with (US)","un(e) colocataire (US)"],
+    ["housemate","a person you share a house with","une personne avec qui on partage une maison"],
+    ["get on well with","to have a good relationship with someone","bien s'entendre avec"],
+    ["fall out with","to argue and stop being friends with someone","se brouiller avec"],
+    ["make it up","to be friends again after an argument","se réconcilier"],
+    ["see eye to eye","to agree with someone","être d'accord avec quelqu'un"],
+    ["make friends","to become friends with someone (NOT 'get/find friends')","se faire des amis"],
+    ["get together","to start a romantic relationship","se mettre ensemble (en couple)"]
   ];
   const ex = [];
-  defs.forEach(([w,d])=>{
+  defs.forEach(([w,d,fr])=>{
     const distractors = pick(defs.filter(x=>x[1]!==d).map(x=>x[1]),3);
-    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors, {fr:`Que veut dire "${w}" ? (réponse : ${fr})`}));
   });
-  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(mcq("Rosie and Matt don't ____ eye to eye.","Complete the common mistake correction.", "see", ["get on","fall out","look"]));
-  ex.push(mcq("It's often difficult to ____ new friends when you move to another city.","Common mistake: choose the correct verb.", "make", ["get","find","take"]));
-  ex.push(typed("We had a quarrel but now we've ____ ____.", "Fill in the phrasal verb meaning 'became friends again' (2 words).", ["made it up","made up"]));
-  ex.push(typed("Jack and Amelia don't ____ ____ ____ ____ (often argue/disagree).", "Fill in the idiom (4 words).", ["see eye to eye"]));
+  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque mot à sa définition."}));
+  ex.push(match("Match the word to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque mot à sa définition."}));
+  ex.push(mcq("Rosie and Matt don't ____ eye to eye.","Complete the common mistake correction.", "see", ["get on","fall out","look"], {fr:"Rosie et Matt ne sont pas toujours d'accord (____ eye to eye). Complète avec le bon verbe."}));
+  ex.push(mcq("It's often difficult to ____ new friends when you move to another city.","Common mistake: choose the correct verb.", "make", ["get","find","take"], {fr:"C'est souvent difficile de ____ (se faire) de nouveaux amis quand on déménage dans une autre ville."}));
+  ex.push(typed("We had a quarrel but now we've ____ ____.", "Fill in the phrasal verb meaning 'became friends again' (2 words).", ["made it up","made up"], {fr:"On s'est disputés mais maintenant on s'est ____ ____ (réconciliés) — 2 mots."}));
+  ex.push(typed("Jack and Amelia don't ____ ____ ____ ____ (often argue/disagree).", "Fill in the idiom (4 words).", ["see eye to eye"], {fr:"Jack et Amelia ne sont pas souvent d'accord (____ ____ ____ ____) — expression de 4 mots."}));
   return shuffle(ex);
 }
 
 /* ---------- 4. Friendship idioms ---------- */
 function buildIdiomsExercises(){
+  // [english idiom, english meaning, french translation]
   const idioms = [
-    ["a shoulder to cry on","someone who listens to your problems"],
-    ["see eye to eye","to agree with someone"],
-    ["hate someone's guts","to very strongly dislike someone"],
-    ["clear the air","to talk about a problem you've been avoiding"],
-    ["bury the hatchet","to stop fighting or quarrelling"],
-    ["patch up our differences","to settle an argument"],
-    ["through thick and thin","friends who share good times and difficult times together"],
-    ["a fair-weather friend","a friend who is only there when things go well for you"]
+    ["a shoulder to cry on","someone who listens to your problems","une épaule sur laquelle pleurer"],
+    ["see eye to eye","to agree with someone","être sur la même longueur d'onde"],
+    ["hate someone's guts","to very strongly dislike someone","détester quelqu'un profondément"],
+    ["clear the air","to talk about a problem you've been avoiding","crever l'abcès, clarifier la situation"],
+    ["bury the hatchet","to stop fighting or quarrelling","enterrer la hache de guerre"],
+    ["patch up our differences","to settle an argument","régler nos différends"],
+    ["through thick and thin","friends who share good times and difficult times together","à travers vents et marées"],
+    ["a fair-weather friend","a friend who is only there when things go well for you","un ami des beaux jours seulement"]
   ];
   const ex = [];
-  idioms.forEach(([w,d])=>{
+  idioms.forEach(([w,d,fr])=>{
     const distractors = pick(idioms.filter(x=>x[1]!==d).map(x=>x[1]),3);
-    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors, {fr:`Que veut dire "${w}" ? (traduction : ${fr})`}));
   });
-  idioms.forEach(([w,d])=>{
+  idioms.forEach(([w,d,fr])=>{
     const distractors = pick(idioms.filter(x=>x[0]!==w).map(x=>x[0]),3);
-    ex.push(mcq(`"${d}"`,"Which idiom matches this definition?", w, distractors));
+    ex.push(mcq(`"${d}"`,"Which idiom matches this definition?", w, distractors, {fr:`Quel idiome correspond à cette définition ? (réponse : ${w} = ${fr})`}));
   });
-  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d])=>({left:w,right:d}))));
+  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque expression idiomatique à sa définition."}));
+  ex.push(match("Match the idiom to its meaning.", pick(idioms,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque expression idiomatique à sa définition."}));
   return shuffle(ex);
 }
 
 /* ---------- 5. Family vocab ---------- */
 function buildFamilyExercises(){
+  // [english, english definition, french translation]
   const defs = [
-    ["widow","a woman whose husband has died"],
-    ["stepfather","the man who is married to your mother but is not your father"],
-    ["elder","older (used for brothers/sisters)"],
-    ["twins","two children born to one mother at the same time"],
-    ["close family","a family who like each other and stay together a lot"],
-    ["only child","someone without brothers or sisters"],
-    ["cousin","the child of your uncle or aunt"],
-    ["nephew","the son of your brother or sister"],
-    ["niece","the daughter of your brother or sister"],
-    ["sister-in-law","your brother's wife, or your husband's/wife's sister"],
-    ["get on well with","to have a good relationship with"],
-    ["altogether","in total"],
-    ["remarried","got married again"],
-    ["current","the one you have now (e.g. current girlfriend)"],
-    ["ex-","prefix for a relationship you had in the past but not anymore"]
+    ["widow","a woman whose husband has died","une veuve"],
+    ["stepfather","the man who is married to your mother but is not your father","un beau-père"],
+    ["elder","older (used for brothers/sisters)","aîné(e)"],
+    ["twins","two children born to one mother at the same time","des jumeaux/jumelles"],
+    ["close family","a family who like each other and stay together a lot","une famille très unie"],
+    ["only child","someone without brothers or sisters","un enfant unique"],
+    ["cousin","the child of your uncle or aunt","un(e) cousin(e)"],
+    ["nephew","the son of your brother or sister","un neveu"],
+    ["niece","the daughter of your brother or sister","une nièce"],
+    ["sister-in-law","your brother's wife, or your husband's/wife's sister","une belle-sœur"],
+    ["get on well with","to have a good relationship with","bien s'entendre avec"],
+    ["altogether","in total","en tout, au total"],
+    ["remarried","got married again","remarié(e)"],
+    ["current","the one you have now (e.g. current girlfriend)","actuel(le)"],
+    ["ex-","prefix for a relationship you had in the past but not anymore","préfixe pour 'ex' (ancien/ancienne)"]
   ];
   const ex = [];
-  defs.forEach(([w,d])=>{
+  defs.forEach(([w,d,fr])=>{
     const distractors = pick(defs.filter(x=>x[1]!==d).map(x=>x[1]),3);
-    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors));
+    ex.push(mcq(`What does "${w}" mean?`,"Choose the correct definition.", d, distractors, {fr:`Que veut dire "${w}" ? (réponse : ${fr})`}));
   });
-  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d])=>({left:w,right:d}))));
-  ex.push(typed("Simon died two years ago, so Cath is a ____.", "Type the missing word.", ["widow"]));
-  ex.push(typed("Tom is Leyla's ____ brother (he is older).", "Type the missing word.", ["elder"]));
-  ex.push(typed("Emily has no brothers or sisters, so she's an ____ ____.", "Type the missing 2-word phrase.", ["only child"]));
-  ex.push(typed("Your ____ boyfriend is the one you have now (not an ex).", "Type the missing word.", ["current"]));
-  ex.push(mcq("It's more natural to say...","Common mistake: choose the correct form.", "Thomas's wife", ["the wife of Thomas","the Thomas's wife","wife of the Thomas"]));
+  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque mot de famille à sa définition."}));
+  ex.push(match("Match the family word to its meaning.", pick(defs,4).map(([w,d,fr])=>({left:w,right:d,leftFr:fr})), {fr:"Associe chaque mot de famille à sa définition."}));
+  ex.push(typed("Simon died two years ago, so Cath is a ____.", "Type the missing word.", ["widow"], {fr:"Simon est mort il y a deux ans, donc Cath est ____ (une veuve)."}));
+  ex.push(typed("Tom is Leyla's ____ brother (he is older).", "Type the missing word.", ["elder"], {fr:"Tom est le frère ____ (aîné) de Leyla (il est plus âgé)."}));
+  ex.push(typed("Emily has no brothers or sisters, so she's an ____ ____.", "Type the missing 2-word phrase.", ["only child"], {fr:"Emily n'a ni frère ni sœur, donc c'est une ____ ____ (enfant unique) — 2 mots."}));
+  ex.push(typed("Your ____ boyfriend is the one you have now (not an ex).", "Type the missing word.", ["current"], {fr:"Ton copain ____ (actuel) est celui que tu as maintenant (pas un ex)."}));
+  ex.push(mcq("It's more natural to say...","Common mistake: choose the correct form.", "Thomas's wife", ["the wife of Thomas","the Thomas's wife","wife of the Thomas"], {fr:"Il est plus naturel de dire... (en anglais, on utilise le génitif 's plutôt que 'of')"}));
   return shuffle(ex);
 }
 
@@ -674,51 +712,52 @@ function buildFamilyExercises(){
 function buildTenseExercises(){
   const ex = [];
   const items = [
-    {sentence:"I ____ (know) Rebecca for a long time.", answer:"have known", distractors:["knew","did know","have know"], explain:"Unfinished duration up to now → present perfect."},
-    {sentence:"We ____ (meet) at a friend's birthday party five years ago.", answer:"met", distractors:["have met","have meet","did met"], explain:"'Five years ago' is a finished time in the past → past simple."},
-    {sentence:"Last year, Rebecca's father ____ (change) his job.", answer:"changed", distractors:["has changed","have changed","was changed"], explain:"'Last year' = finished past time → past simple."},
-    {sentence:"Since then, we ____ (not/see) each other very much.", answer:"haven't seen", distractors:["didn't see","haven't see","don't see"], explain:"'Since then' connects the past to now → present perfect."},
-    {sentence:"Brad Pitt and Angelina Jolie ____ (donate) $1,000,000 when they launched their foundation.", answer:"donated", distractors:["have donated","has donated","did donated"], explain:"A specific finished past event → past simple."},
-    {sentence:"The RSPCA ____ (take care of) animals since 1824.", answer:"has taken care of", distractors:["took care of","is taking care of","take care of"], explain:"'Since 1824' → action continuing to now → present perfect."},
-    {sentence:"We ____ (never/organize) a Red Nose Day in my school so far.", answer:"have never organized", distractors:["never organized","didn't organized","never organize"], explain:"'So far' signals present perfect."},
-    {sentence:"Every 15 seconds a person dies from TB. Damian Action ____ (help) fight this disease since 1964.", answer:"has helped", distractors:["helped","help","was helping"], explain:"'Since 1964' → present perfect."},
-    {sentence:"She was born in Hawaii but she ____ (grow up) in Sydney.", answer:"grew up", distractors:["has grown up","have grown up","was grow up"], explain:"Completed single past event → past simple."},
-    {sentence:"She first appeared on stage when she ____ (be) five.", answer:"was", distractors:["has been","have been","were"], explain:"'When she was five' = specific past moment → past simple."},
-    {sentence:"She has been an actress ever ____.", answer:"since", distractors:["for","ago","when"], explain:"'Ever since' pairs with present perfect."},
-    {sentence:"Guess what! I ____ (meet) a wonderful man. We ____ (go) to the cinema together last night.", answer:"have met / went", distractors:["met / have gone","have met / have gone","met / went"], explain:"News announced now = present perfect; specific past detail ('last night') = past simple."}
+    {sentence:"I ____ (know) Rebecca for a long time.", answer:"have known", distractors:["knew","did know","have know"], explain:"Unfinished duration up to now → present perfect.", fr:"Je connais Rebecca depuis longtemps (durée non terminée → present perfect)."},
+    {sentence:"We ____ (meet) at a friend's birthday party five years ago.", answer:"met", distractors:["have met","have meet","did met"], explain:"'Five years ago' is a finished time in the past → past simple.", fr:"On s'est rencontrés à l'anniversaire d'un ami il y a cinq ans (moment précis et terminé → past simple)."},
+    {sentence:"Last year, Rebecca's father ____ (change) his job.", answer:"changed", distractors:["has changed","have changed","was changed"], explain:"'Last year' = finished past time → past simple.", fr:"L'année dernière, le père de Rebecca a changé de travail (moment terminé → past simple)."},
+    {sentence:"Since then, we ____ (not/see) each other very much.", answer:"haven't seen", distractors:["didn't see","haven't see","don't see"], explain:"'Since then' connects the past to now → present perfect.", fr:"Depuis, on ne s'est pas beaucoup vus (lien passé-présent → present perfect)."},
+    {sentence:"Brad Pitt and Angelina Jolie ____ (donate) $1,000,000 when they launched their foundation.", answer:"donated", distractors:["have donated","has donated","did donated"], explain:"A specific finished past event → past simple.", fr:"Brad Pitt et Angelina Jolie ont donné 1 000 000 $ quand ils ont lancé leur fondation (événement précis et terminé → past simple)."},
+    {sentence:"The RSPCA ____ (take care of) animals since 1824.", answer:"has taken care of", distractors:["took care of","is taking care of","take care of"], explain:"'Since 1824' → action continuing to now → present perfect.", fr:"La RSPCA s'occupe d'animaux depuis 1824 (action qui continue → present perfect)."},
+    {sentence:"We ____ (never/organize) a Red Nose Day in my school so far.", answer:"have never organized", distractors:["never organized","didn't organized","never organize"], explain:"'So far' signals present perfect.", fr:"On n'a encore jamais organisé de Red Nose Day dans mon école (jusqu'à présent → present perfect)."},
+    {sentence:"Every 15 seconds a person dies from TB. Damian Action ____ (help) fight this disease since 1964.", answer:"has helped", distractors:["helped","help","was helping"], explain:"'Since 1964' → present perfect.", fr:"Toutes les 15 secondes, une personne meurt de la tuberculose. Damian Action aide à combattre cette maladie depuis 1964 (present perfect)."},
+    {sentence:"She was born in Hawaii but she ____ (grow up) in Sydney.", answer:"grew up", distractors:["has grown up","have grown up","was grow up"], explain:"Completed single past event → past simple.", fr:"Elle est née à Hawaï mais elle a grandi à Sydney (événement terminé unique → past simple)."},
+    {sentence:"She first appeared on stage when she ____ (be) five.", answer:"was", distractors:["has been","have been","were"], explain:"'When she was five' = specific past moment → past simple.", fr:"Elle est montée sur scène pour la première fois quand elle avait cinq ans (moment précis dans le passé → past simple)."},
+    {sentence:"She has been an actress ever ____.", answer:"since", distractors:["for","ago","when"], explain:"'Ever since' pairs with present perfect.", fr:"Elle est actrice depuis (ever ____) — expression qui s'utilise avec le present perfect."},
+    {sentence:"Guess what! I ____ (meet) a wonderful man. We ____ (go) to the cinema together last night.", answer:"have met / went", distractors:["met / have gone","have met / have gone","met / went"], explain:"News announced now = present perfect; specific past detail ('last night') = past simple.", fr:"Devine quoi ! J'ai rencontré un homme formidable. On est allés au cinéma ensemble hier soir (annonce d'une nouvelle = present perfect ; détail précis 'hier soir' = past simple)."}
   ];
   items.forEach(it=>{
-    ex.push(mcq(it.sentence, "Choose the correct verb form.", it.answer, it.distractors, {explain:it.explain}));
+    ex.push(mcq(it.sentence, "Choose the correct verb form.", it.answer, it.distractors, {explain:it.explain, fr:it.fr}));
   });
   return shuffle(ex);
 }
 
 /* ---------- 7. Grammar: for / since ---------- */
 function buildForSinceExercises(){
+  // [sentence, answer, french translation]
   const items = [
-    ["Music for Relief have given over $5,000,000 in donations ____ their beginnings in 2005.","since"],
-    ["My school has been involved in numerous charities ____ more than ten years now.","for"],
-    ["Ben has never had a relapse ____ he left hospital.","since"],
-    ["Jane Goodall has taken action on behalf of endangered species ____ more than 50 years.","for"],
-    ["I have known my friend Rebecca ____ a long time.","for"],
-    ["We haven't seen each other very much ____ then.","since"],
-    ["She has been an actress ____ she was five.","since"],
-    ["They have been friends ____ 20 years.","for"]
+    ["Music for Relief have given over $5,000,000 in donations ____ their beginnings in 2005.","since","Music for Relief a donné plus de 5 000 000 $ ____ (depuis) ses débuts en 2005."],
+    ["My school has been involved in numerous charities ____ more than ten years now.","for","Mon école est impliquée dans de nombreuses associations caritatives ____ (depuis, pendant) plus de dix ans maintenant."],
+    ["Ben has never had a relapse ____ he left hospital.","since","Ben n'a jamais eu de rechute ____ (depuis) qu'il a quitté l'hôpital."],
+    ["Jane Goodall has taken action on behalf of endangered species ____ more than 50 years.","for","Jane Goodall agit pour les espèces menacées ____ (depuis, pendant) plus de 50 ans."],
+    ["I have known my friend Rebecca ____ a long time.","for","Je connais mon amie Rebecca ____ (depuis) longtemps."],
+    ["We haven't seen each other very much ____ then.","since","On ne s'est pas beaucoup vus ____ (depuis) ce moment-là."],
+    ["She has been an actress ____ she was five.","since","Elle est actrice ____ (depuis) qu'elle a cinq ans."],
+    ["They have been friends ____ 20 years.","for","Ils sont amis ____ (depuis, pendant) 20 ans."]
   ];
-  const ex = items.map(([sentence,answer])=> mcq(sentence,"FOR (duration) or SINCE (starting point)?", answer, [answer==="for"?"since":"for"], {explain: answer==="for" ? "FOR + a length of time (e.g. 'for 10 years')." : "SINCE + a starting point in time (e.g. 'since 2005', 'since I left')."}));
-  items.forEach(([sentence,answer])=> ex.push(typed(sentence.replace("____","____"),"Type FOR or SINCE.",[answer])));
+  const ex = items.map(([sentence,answer,fr])=> mcq(sentence,"FOR (duration) or SINCE (starting point)?", answer, [answer==="for"?"since":"for"], {explain: answer==="for" ? "FOR + a length of time (e.g. 'for 10 years')." : "SINCE + a starting point in time (e.g. 'since 2005', 'since I left').", fr}));
+  items.forEach(([sentence,answer,fr])=> ex.push(typed(sentence.replace("____","____"),"Type FOR or SINCE.",[answer],{fr})));
   return shuffle(ex);
 }
 
 /* ---------- 8. Grammar: expressing purpose ---------- */
 function buildPurposeExercises(){
   const ex = [];
-  ex.push(mcq("They organized a baseball match ____ raise funds to help the homeless.","Choose the correct way to express purpose.", "in order to", ["for to","for","for raise"], {explain:"Never use FOR + verb to express purpose. Use to / in order to / so as to."}));
-  ex.push(mcq("We held this charity sale ____ raise funds for school children in Africa.","Choose the correct option.", "to", ["for","for to","for raising"], {explain:"'To + verb' is the simplest way to express purpose."}));
-  ex.push(mcq("We chose a school in Africa ____ help underprivileged kids get an education.","Choose the correct option.", "so as to", ["for","for to","in order for"], {explain:"'So as to + verb' also expresses purpose."}));
-  ex.push(mcq("Which structure is WRONG to express purpose?","Spot the mistake.", "for + verb", ["to + verb","in order to + verb","so as to + verb"], {explain:"'FOR' is never followed directly by a verb to express purpose in English."}));
-  ex.push(typed("They practised every day ____ ____ improve their English. (2 words)","Complete with a purpose structure.",["in order","so as"]));
-  ex.push(mcq("We chose to speak directly to the media ____ reach as many people as possible.","Choose the correct option.", "to", ["for","for to","for reaching"], {explain:"'To + verb' expresses the goal of the action."}));
+  ex.push(mcq("They organized a baseball match ____ raise funds to help the homeless.","Choose the correct way to express purpose.", "in order to", ["for to","for","for raise"], {explain:"Never use FOR + verb to express purpose. Use to / in order to / so as to.", fr:"Ils ont organisé un match de baseball ____ (pour) récolter des fonds pour aider les sans-abri."}));
+  ex.push(mcq("We held this charity sale ____ raise funds for school children in Africa.","Choose the correct option.", "to", ["for","for to","for raising"], {explain:"'To + verb' is the simplest way to express purpose.", fr:"On a organisé cette vente caritative ____ (pour) récolter des fonds pour des enfants scolarisés en Afrique."}));
+  ex.push(mcq("We chose a school in Africa ____ help underprivileged kids get an education.","Choose the correct option.", "so as to", ["for","for to","in order for"], {explain:"'So as to + verb' also expresses purpose.", fr:"On a choisi une école en Afrique ____ (afin d') aider des enfants défavorisés à recevoir une éducation."}));
+  ex.push(mcq("Which structure is WRONG to express purpose?","Spot the mistake.", "for + verb", ["to + verb","in order to + verb","so as to + verb"], {explain:"'FOR' is never followed directly by a verb to express purpose in English.", fr:"Quelle structure est INCORRECTE pour exprimer le but en anglais ? (rappel : jamais 'for' + verbe)"}));
+  ex.push(typed("They practised every day ____ ____ improve their English. (2 words)","Complete with a purpose structure.",["in order","so as"],{fr:"Ils s'entraînaient tous les jours ____ ____ (afin d') améliorer leur anglais — 2 mots."}));
+  ex.push(mcq("We chose to speak directly to the media ____ reach as many people as possible.","Choose the correct option.", "to", ["for","for to","for reaching"], {explain:"'To + verb' expresses the goal of the action.", fr:"On a choisi de parler directement aux médias ____ (pour) toucher un maximum de personnes."}));
   return shuffle(ex);
 }
 
@@ -737,7 +776,8 @@ function loadState(){
     completedUnits:{}, // unitId -> {stars, bestScore}
     streak: 0,
     lastPlayedDate: null,
-    totalXP: 0
+    totalXP: 0,
+    showTranslations: false
   }, saved);
 }
 function saveState(){
@@ -822,6 +862,13 @@ function renderHome(){
       <button id="btn-parent-off">Désactiver</button>
     </div>` : "";
 
+  const translationsOn = !!state.showTranslations;
+  const translationBanner = `
+    <div class="parent-banner" style="${translationsOn?'':'background:var(--surface-2);border-style:solid;border-color:var(--border);color:var(--text-muted);'}">
+      <span>${translationsOn ? '🇫🇷 Traductions affichées : les phrases et réponses apparaissent aussi en français.' : '🇫🇷 Traductions masquées : entraîne-toi en anglais seul.'}</span>
+      <button id="btn-translations-toggle">${translationsOn ? 'Désactiver' : 'Activer'}</button>
+    </div>`;
+
   app.innerHTML = `
     <div class="home-toprow">
       <button class="pill-btn" id="btn-howto">❓ Mode d'emploi</button>
@@ -835,6 +882,7 @@ function renderHome(){
       </div>
     </div>
     ${parentBanner}
+    ${translationBanner}
     <div style="display:flex;gap:10px;">
       <div class="stat-pill" style="flex:1;">
         <span class="num">🔥 ${state.streak}</span>
@@ -874,6 +922,12 @@ function renderHome(){
       renderHome();
     });
   }
+  document.getElementById("btn-translations-toggle").addEventListener("click", (e)=>{
+    e.stopPropagation();
+    state.showTranslations = !state.showTranslations;
+    saveState();
+    renderHome();
+  });
 }
 
 /* ---------- Modals: how-to (FR) & parent mode ---------- */
@@ -917,7 +971,10 @@ function showHowToModal(){
     <p style="font-size:13.5px;color:var(--text-muted);margin-top:10px;">Si les 5 cœurs sont perdus, la mission s'arrête : pas de panique, on peut toujours recommencer !</p>
 
     <h3>4. Recommencer une mission</h3>
-    <p style="font-size:14px;margin:0;">Tu peux rejouer une mission déjà terminée pour améliorer ton score et gagner plus d'étoiles. Ta progression est sauvegardée automatiquement sur cet appareil.</p>
+    <p style="font-size:14px;margin:0 0 12px;">Tu peux rejouer une mission déjà terminée pour améliorer ton score et gagner plus d'étoiles. Ta progression est sauvegardée automatiquement sur cet appareil.</p>
+
+    <h3>5. 🇫🇷 Traductions</h3>
+    <p style="font-size:14px;margin:0;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
   `);
 }
 
@@ -992,12 +1049,18 @@ function renderExercise(item, unit){
   session.answered = false;
 
   if(item.type === "mcq"){
+    const trOn = !!state.showTranslations;
+    const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
     cardEl.innerHTML = `
       <div class="prompt-kicker">${unit.title}</div>
       <p class="prompt">${item.prompt}</p>
       <p class="prompt-sub">${item.sub}</p>
+      ${frHint}
       <div class="choices">
-        ${item.options.map((opt,i)=>`<button class="choice" data-opt="${escapeAttr(opt)}">${opt}</button>`).join("")}
+        ${item.options.map((opt,i)=>{
+          const optFr = (trOn && item.optionsFr && item.optionsFr[opt]) ? `<span class="opt-fr">🇫🇷 ${item.optionsFr[opt]}</span>` : "";
+          return `<button class="choice" data-opt="${escapeAttr(opt)}">${opt}${optFr}</button>`;
+        }).join("")}
       </div>
     `;
     barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
@@ -1024,10 +1087,13 @@ function renderExercise(item, unit){
     });
 
   } else if(item.type === "typed"){
+    const trOn = !!state.showTranslations;
+    const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
     cardEl.innerHTML = `
       <div class="prompt-kicker">${unit.title}</div>
       <p class="prompt">${item.prompt}</p>
       <p class="prompt-sub">${item.sub}</p>
+      ${frHint}
       <input type="text" class="blank-input" id="typed-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="off" spellcheck="false">
     `;
     barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
@@ -1050,20 +1116,24 @@ function renderExercise(item, unit){
     });
 
   } else if(item.type === "match"){
-    const leftItems = shuffle(item.pairs.map((p,i)=>({id:"L"+i, text:p.left, pairId:i})));
-    const rightItems = shuffle(item.pairs.map((p,i)=>({id:"R"+i, text:p.right, pairId:i})));
+    const trOn = !!state.showTranslations;
+    const leftItems = shuffle(item.pairs.map((p,i)=>({id:"L"+i, text:p.left, fr:p.leftFr||"", pairId:i})));
+    const rightItems = shuffle(item.pairs.map((p,i)=>({id:"R"+i, text:p.right, fr:p.rightFr||"", pairId:i})));
     session.matchState = { matched: new Set(), selectedLeft:null, selectedRight:null, mistakes:0, pairsCount:item.pairs.length };
+
+    const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
 
     cardEl.innerHTML = `
       <div class="prompt-kicker">${unit.title}</div>
       <p class="prompt">${item.prompt}</p>
       <p class="prompt-sub">Tap one item on each side to match them.</p>
+      ${frHint}
       <div class="match-cols">
         <div class="match-col" id="col-left">
-          ${leftItems.map(li=>`<button class="match-item" data-id="${li.id}" data-pair="${li.pairId}">${li.text}</button>`).join("")}
+          ${leftItems.map(li=>`<button class="match-item" data-id="${li.id}" data-pair="${li.pairId}">${li.text}${(trOn && li.fr)?`<span class="item-fr">🇫🇷 ${li.fr}</span>`:""}</button>`).join("")}
         </div>
         <div class="match-col" id="col-right">
-          ${rightItems.map(ri=>`<button class="match-item" data-id="${ri.id}" data-pair="${ri.pairId}">${ri.text}</button>`).join("")}
+          ${rightItems.map(ri=>`<button class="match-item" data-id="${ri.id}" data-pair="${ri.pairId}">${ri.text}${(trOn && ri.fr)?`<span class="item-fr">🇫🇷 ${ri.fr}</span>`:""}</button>`).join("")}
         </div>
       </div>
     `;

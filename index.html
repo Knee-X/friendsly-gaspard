@@ -960,10 +960,15 @@ function render(){
     if(unit) return renderPlay(unit);
   }
   if(hash === "listening"){ return renderListeningMenu(); }
+  if(hash.startsWith("listen-quiz-")){
+    const textId = hash.replace("listen-quiz-","");
+    const text = LISTENING_TEXTS.find(t=>t.id===textId);
+    if(text) return renderListeningQuestions(text);
+  }
   if(hash.startsWith("listen-")){
     const textId = hash.replace("listen-","");
     const text = LISTENING_TEXTS.find(t=>t.id===textId);
-    if(text) return renderListeningPlay(text);
+    if(text) return renderListeningAudio(text);
   }
   renderHome();
 }
@@ -1132,7 +1137,7 @@ function showHowToModal(){
     <p style="font-size:14px;margin:0 0 12px;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
 
     <h3>6. 🎧 Listening</h3>
-    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil lit un texte à voix haute (bouton ▶️) : écoute-le une ou plusieurs fois, puis réponds aux questions sans regarder le texte écrit. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Deux vitesses sont disponibles (🐢 Lent / 🚶 Normal) juste au-dessus du bouton d'écoute — choisis celle qui te convient le mieux. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
+    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil se joue en deux étapes. D'abord l'écoute : lis le texte à voix haute (bouton ▶️) autant de fois que tu veux, avec deux vitesses possibles (🐢 Lent / 🚶 Normal). Une fois prêt, clique sur "J'ai fini d'écouter" : tu passes alors à toutes les questions à la suite, sur un écran séparé, sans que l'audio ne redémarre ni ne s'arrête. Réponds à toutes les questions puis corrige-les d'un coup. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
   `);
 }
 
@@ -1247,7 +1252,7 @@ function renderListeningMenu(){
     </div>
     <div class="translation-hint" style="margin-top:0;">
       <span class="flag">💡</span>
-      <span>Écoute d'abord le texte une ou plusieurs fois (bouton ▶️), puis réponds aux questions. Le texte écrit n'apparaît qu'à la fin, pour la correction.</span>
+      <span>Écoute d'abord le texte une ou plusieurs fois (bouton ▶️), puis passe aux questions quand tu es prêt. L'audio ne sera jamais coupé par une réponse. Le texte écrit n'apparaît qu'à la fin, pour la correction.</span>
     </div>
     <div class="section-title">Choisis un texte</div>
     <div class="path">${cardsHtml}</div>
@@ -1258,23 +1263,10 @@ function renderListeningMenu(){
   });
 }
 
-function renderListeningPlay(textItem){
-  if(!session || session.kind!=="listening" || session.textId!==textItem.id){
-    session = {
-      kind:"listening",
-      textId: textItem.id,
-      idx: 0,
-      correctCount: 0,
-      total: textItem.questions.length,
-      answered: false,
-      playsUsed: 0
-    };
-  }
-  if(session.idx >= session.total){ return renderListeningResult(textItem); }
-
-  const item = session.questions ? session.questions[session.idx] : textItem.questions[session.idx];
-  const progressPct = Math.round((session.idx/session.total)*100);
-
+/* Step 1: free listening screen. The audio here is never interrupted by
+   answering a question — questions live on a separate screen entirely,
+   so validating an answer can no longer restart or cut off playback. */
+function renderListeningAudio(textItem){
   const speedIsSlow = state.speechSpeed !== "normal";
   const voiceChoices = englishVoices();
   const activeVoice = pickBestVoice();
@@ -1287,11 +1279,11 @@ function renderListeningPlay(textItem){
   app.innerHTML = `
     <div class="topbar">
       <button class="iconbtn" id="btn-exit">✕</button>
-      <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+      <div style="flex:1;"></div>
     </div>
     <div class="card" style="margin-bottom:12px;">
       <div class="prompt-kicker">🎧 ${textItem.title}</div>
-      <p class="prompt-sub" style="margin-bottom:10px;">Réécoute autant de fois que nécessaire avant de répondre.</p>
+      <p class="prompt-sub" style="margin-bottom:10px;">Réécoute autant de fois que nécessaire. L'écoute ne sera jamais interrompue une fois que tu passeras aux questions.</p>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
         <button class="pill-btn ${speedIsSlow?'active':''}" id="btn-speed-slow" style="flex:1;justify-content:center;">🐢 Lent</button>
         <button class="pill-btn ${!speedIsSlow?'active':''}" id="btn-speed-normal" style="flex:1;justify-content:center;">🚶 Normal</button>
@@ -1299,22 +1291,22 @@ function renderListeningPlay(textItem){
       ${voicePickerHtml}
       <button class="btn btn-primary" id="btn-play" style="width:100%;">▶️ Écouter le texte</button>
     </div>
-    <div class="card" id="exercise-card"></div>
-    <div class="bottom-bar" id="bottom-bar"></div>
+    <div class="bottom-bar">
+      <button class="btn btn-success" id="btn-to-questions">J'ai fini d'écouter, répondre aux questions →</button>
+    </div>
   `;
   document.getElementById("btn-exit").addEventListener("click", ()=>{ stopSpeaking(); go("listening"); });
   document.getElementById("btn-play").addEventListener("click", ()=>{
-    session.playsUsed++;
     const ok = speak(textItem.text, textItem.lang);
     if(!ok){
       document.getElementById("btn-play").textContent = "⚠️ Lecture audio indisponible sur ce navigateur";
     }
   });
   document.getElementById("btn-speed-slow").addEventListener("click", ()=>{
-    state.speechSpeed = "slow"; saveState(); renderListeningPlay(textItem);
+    state.speechSpeed = "slow"; saveState(); renderListeningAudio(textItem);
   });
   document.getElementById("btn-speed-normal").addEventListener("click", ()=>{
-    state.speechSpeed = "normal"; saveState(); renderListeningPlay(textItem);
+    state.speechSpeed = "normal"; saveState(); renderListeningAudio(textItem);
   });
   const voiceSelect = document.getElementById("voice-select");
   if(voiceSelect){
@@ -1322,69 +1314,94 @@ function renderListeningPlay(textItem){
       state.voiceName = voiceSelect.value; saveState();
     });
   }
-
-  renderListeningExercise(item, textItem);
+  document.getElementById("btn-to-questions").addEventListener("click", ()=>{
+    go("listen-quiz-"+textItem.id);
+  });
 }
 
-function renderListeningExercise(item, textItem){
-  const cardEl = document.getElementById("exercise-card");
-  const barEl = document.getElementById("bottom-bar");
-  session.answered = false;
+/* Step 2: all questions on one scrollable screen, answered one after another
+   with no audio control on this screen at all — nothing here can restart
+   or stop playback, so a still-playing text keeps going undisturbed. */
+function renderListeningQuestions(textItem){
+  session = {
+    kind: "listening",
+    textId: textItem.id,
+    total: textItem.questions.length,
+    correctCount: 0,
+    answers: new Array(textItem.questions.length).fill(null)
+  };
   const trOn = !!state.showTranslations;
-  const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
 
-  cardEl.innerHTML = `
-    <div class="prompt-kicker">Question ${session.idx+1}/${session.total}</div>
-    <p class="prompt">${item.prompt}</p>
-    <p class="prompt-sub">${item.sub}</p>
-    ${frHint}
-    <div class="choices">
-      ${item.options.map(opt=>{
-        const optFr = (trOn && item.optionsFr && item.optionsFr[opt]) ? `<span class="opt-fr">🇫🇷 ${item.optionsFr[opt]}</span>` : "";
-        return `<button class="choice" data-opt="${escapeAttr(opt)}">${opt}${optFr}</button>`;
-      }).join("")}
+  const questionsHtml = textItem.questions.map((item,qi)=>{
+    const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
+    const choicesHtml = item.options.map(opt=>{
+      const optFr = (trOn && item.optionsFr && item.optionsFr[opt]) ? `<span class="opt-fr">🇫🇷 ${item.optionsFr[opt]}</span>` : "";
+      return `<button class="choice" data-q="${qi}" data-opt="${escapeAttr(opt)}">${opt}${optFr}</button>`;
+    }).join("");
+    return `
+      <div class="card" style="margin-bottom:14px;" data-question-card="${qi}">
+        <div class="prompt-kicker">Question ${qi+1}/${textItem.questions.length}</div>
+        <p class="prompt">${item.prompt}</p>
+        <p class="prompt-sub">${item.sub}</p>
+        ${frHint}
+        <div class="choices">${choicesHtml}</div>
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div style="flex:1;"></div>
+    </div>
+    <div class="prompt-kicker" style="margin:0 2px;">🎧 ${textItem.title}</div>
+    ${questionsHtml}
+    <div class="bottom-bar">
+      <button class="btn btn-primary" id="btn-submit-all" disabled>Corriger mes réponses</button>
     </div>
   `;
-  barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
-  let selected = null;
-  cardEl.querySelectorAll(".choice").forEach(btn=>{
+  document.getElementById("btn-exit").addEventListener("click", ()=> go("listening"));
+
+  function updateSubmitState(){
+    const allAnswered = session.answers.every(a=>a!==null);
+    document.getElementById("btn-submit-all").disabled = !allAnswered;
+  }
+
+  app.querySelectorAll(".choice").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      if(session.answered) return;
+      const qi = Number(btn.dataset.q);
+      if(session.answers[qi]!==null) return; // already locked in once corrected
+      const cardEl = app.querySelector(`[data-question-card="${qi}"]`);
       cardEl.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));
       btn.classList.add("selected");
-      selected = btn.dataset.opt;
-      document.getElementById("btn-check").disabled = false;
+      session.answers[qi] = btn.dataset.opt;
+      updateSubmitState();
     });
   });
-  document.getElementById("btn-check").addEventListener("click", ()=>{
-    if(!selected || session.answered) return;
-    const isCorrect = selected === item.correct;
-    session.answered = true;
-    if(isCorrect) session.correctCount++;
-    cardEl.querySelectorAll(".choice").forEach(b=>{
-      b.disabled = true;
-      if(b.dataset.opt === item.correct) b.classList.add("correct");
-      else if(b.dataset.opt === selected) b.classList.add("wrong");
+
+  document.getElementById("btn-submit-all").addEventListener("click", ()=>{
+    textItem.questions.forEach((item,qi)=>{
+      const cardEl = app.querySelector(`[data-question-card="${qi}"]`);
+      const selected = session.answers[qi];
+      const isCorrect = selected === item.correct;
+      if(isCorrect) session.correctCount++;
+      cardEl.querySelectorAll(".choice").forEach(b=>{
+        b.disabled = true;
+        if(b.dataset.opt === item.correct) b.classList.add("correct");
+        else if(b.dataset.opt === selected) b.classList.add("wrong");
+      });
+      const trOnNow = !!state.showTranslations;
+      const correctFr = (trOnNow && item.optionsFr && item.optionsFr[item.correct]) ? ` <span style="opacity:.8;">(🇫🇷 ${item.optionsFr[item.correct]})</span>` : "";
+      if(!isCorrect){
+        const note = document.createElement("p");
+        note.className = "prompt-sub";
+        note.style.marginTop = "8px";
+        note.innerHTML = `Correct answer: <strong>${item.correct}</strong>${correctFr}.`;
+        cardEl.appendChild(note);
+      }
     });
-    const panelClass = isCorrect ? "ok" : "ko";
-    const emoji = isCorrect ? "🎉" : "😿";
-    const correctFr = (trOn && item.optionsFr && item.optionsFr[item.correct]) ? ` <span style="opacity:.8;">(🇫🇷 ${item.optionsFr[item.correct]})</span>` : "";
-    const text = isCorrect ? "" : `Correct answer: <strong>${item.correct}</strong>${correctFr}.`;
-    barEl.innerHTML = `
-      <div class="feedback-panel ${panelClass}">
-        <div class="emoji">${emoji}</div>
-        <div>
-          <p class="fb-title">${isCorrect?pickPraise():"Not quite!"}</p>
-          <p class="fb-text">${text}</p>
-        </div>
-      </div>
-      <button class="btn ${isCorrect?'btn-success':'btn-error'}" id="btn-continue">Continue</button>
-    `;
-    document.getElementById("btn-continue").addEventListener("click", ()=>{
-      stopSpeaking();
-      session.idx++;
-      renderListeningPlay(textItem);
-    });
+    document.getElementById("btn-submit-all").outerHTML = `<button class="btn btn-success" id="btn-see-result">Voir mon score →</button>`;
+    document.getElementById("btn-see-result").addEventListener("click", ()=> renderListeningResult(textItem));
+    window.scrollTo({top:0, behavior:"smooth"});
   });
 }
 

@@ -916,7 +916,8 @@ function loadState(){
     totalXP: 0,
     showTranslations: false,
     listeningScores: {}, // textId -> {best}
-    speechSpeed: "slow" // "slow" or "normal"
+    speechSpeed: "slow", // "slow" or "normal"
+    voiceName: null // preferred SpeechSynthesisVoice name, or null for auto-pick
   }, saved);
 }
 function saveState(){
@@ -1157,12 +1158,54 @@ function showParentModal(){
 
 /* ---------- LISTENING ---------- */
 const SPEECH_RATES = { slow: 0.62, normal: 0.8 };
+
+let cachedVoices = [];
+function loadVoicesOnce(){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    cachedVoices = window.speechSynthesis.getVoices() || [];
+  }catch(e){}
+}
+if(typeof window!=="undefined" && 'speechSynthesis' in window){
+  loadVoicesOnce();
+  window.speechSynthesis.onvoiceschanged = loadVoicesOnce;
+}
+
+/* Ranks English voices so the clearest ones (labelled "Enhanced"/"Premium"/
+   "Natural" on iOS/macOS, or Google's higher-quality voices elsewhere) come
+   first, instead of the terse default voice the OS picks otherwise. */
+function englishVoices(){
+  return cachedVoices.filter(v=> (v.lang||"").toLowerCase().startsWith("en"));
+}
+function bestVoiceScore(v){
+  const name = (v.name||"").toLowerCase();
+  let score = 0;
+  if(/enhanced|premium|natural|neural/.test(name)) score += 10;
+  if(/siri/.test(name)) score += 6;
+  if(/google/.test(name)) score += 4;
+  if((v.lang||"").toLowerCase()==="en-gb") score += 2;
+  if(v.localService) score += 1;
+  return score;
+}
+function pickBestVoice(){
+  const voices = englishVoices();
+  if(voices.length===0) return null;
+  const preferredName = state.voiceName;
+  if(preferredName){
+    const match = voices.find(v=>v.name===preferredName);
+    if(match) return match;
+  }
+  return voices.slice().sort((a,b)=> bestVoiceScore(b)-bestVoiceScore(a))[0];
+}
+
 function speak(text, lang){
   try{
     if(!('speechSynthesis' in window)) return false;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = lang || "en-GB";
+    const voice = pickBestVoice();
+    if(voice){ utter.voice = voice; utter.lang = voice.lang; }
+    else { utter.lang = lang || "en-GB"; }
     utter.rate = SPEECH_RATES[state.speechSpeed] || SPEECH_RATES.slow;
     utter.pitch = 1;
     window.speechSynthesis.speak(utter);
@@ -1233,6 +1276,13 @@ function renderListeningPlay(textItem){
   const progressPct = Math.round((session.idx/session.total)*100);
 
   const speedIsSlow = state.speechSpeed !== "normal";
+  const voiceChoices = englishVoices();
+  const activeVoice = pickBestVoice();
+  const voicePickerHtml = voiceChoices.length > 1 ? `
+      <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">Voix (si celle-ci n'est pas claire, essaie une autre) :</label>
+      <select id="voice-select" class="blank-input" style="margin-bottom:10px;font-size:13.5px;padding:9px 12px;">
+        ${voiceChoices.map(v=>`<option value="${escapeAttr(v.name)}" ${activeVoice && v.name===activeVoice.name?'selected':''}>${v.name} (${v.lang})</option>`).join("")}
+      </select>` : "";
 
   app.innerHTML = `
     <div class="topbar">
@@ -1246,6 +1296,7 @@ function renderListeningPlay(textItem){
         <button class="pill-btn ${speedIsSlow?'active':''}" id="btn-speed-slow" style="flex:1;justify-content:center;">🐢 Lent</button>
         <button class="pill-btn ${!speedIsSlow?'active':''}" id="btn-speed-normal" style="flex:1;justify-content:center;">🚶 Normal</button>
       </div>
+      ${voicePickerHtml}
       <button class="btn btn-primary" id="btn-play" style="width:100%;">▶️ Écouter le texte</button>
     </div>
     <div class="card" id="exercise-card"></div>
@@ -1265,6 +1316,12 @@ function renderListeningPlay(textItem){
   document.getElementById("btn-speed-normal").addEventListener("click", ()=>{
     state.speechSpeed = "normal"; saveState(); renderListeningPlay(textItem);
   });
+  const voiceSelect = document.getElementById("voice-select");
+  if(voiceSelect){
+    voiceSelect.addEventListener("change", ()=>{
+      state.voiceName = voiceSelect.value; saveState();
+    });
+  }
 
   renderListeningExercise(item, textItem);
 }

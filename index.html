@@ -572,6 +572,45 @@ const UNITS = [
   }
 ];
 
+/* ============================================================
+   LISTENING — texts read aloud by the browser's speech synthesis,
+   with comprehension questions answered without seeing the text.
+   Sourced from reading passages in the chapter that have NOT been
+   used as listening material in class yet (Rebecca / Tina & Will).
+   ============================================================ */
+const LISTENING_TEXTS = [
+  {
+    id: "rebecca",
+    title: "My friend Rebecca",
+    blurb: "Kylie talks about her friendship with Rebecca",
+    lang: "en-GB",
+    text: "I have known my friend Rebecca for a long time. We first met at a friend's birthday party five years ago. We found out that we both liked techno and Green Day. So, I invited Rebecca over to my place. We listened to music together and soon became best friends. Three years ago, Rebecca's parents invited me to go on holiday with them. It was great! We spent three wonderful weeks in a little cottage in Ireland. Rebecca and I loved walking along the beautiful beach. We took a lot of photos and had a lot of fun. Two years ago, I spent a week in hospital and Rebecca came to see me every day. But then, last year, Rebecca's father changed his job, and they moved to another town. Since then, we haven't seen each other very much, but we've talked on the phone or via Skype and we've written e-mails to each other.",
+    questions: [
+      mcq("Where did Kylie and Rebecca first meet?","Choose the correct answer.","At a friend's birthday party",["At school","On holiday in Ireland","At the hospital"],{fr:"Où Kylie et Rebecca se sont-elles rencontrées pour la première fois ?", optionsFr:{"At a friend's birthday party":"À l'anniversaire d'un ami (correct)","At school":"À l'école","On holiday in Ireland":"En vacances en Irlande","At the hospital":"À l'hôpital"}}),
+      mcq("What did they both like?","Choose the correct answer.","Techno and Green Day",["Football and cinema","Photography and cooking","Books and art"],{fr:"Qu'aimaient-elles toutes les deux ?", optionsFr:{"Techno and Green Day":"La techno et Green Day (correct)","Football and cinema":"Le foot et le cinéma","Photography and cooking":"La photo et la cuisine","Books and art":"Les livres et l'art"}}),
+      mcq("Where did they go on holiday together?","Choose the correct answer.","Ireland",["Spain","Scotland","Wales"],{fr:"Où sont-elles parties en vacances ensemble ?", optionsFr:{"Ireland":"En Irlande (correct)","Spain":"En Espagne","Scotland":"En Écosse","Wales":"Au Pays de Galles"}}),
+      mcq("What happened two years ago?","Choose the correct answer.","Kylie spent a week in hospital",["Rebecca got married","Kylie moved to another town","They stopped being friends"],{fr:"Que s'est-il passé il y a deux ans ?", optionsFr:{"Kylie spent a week in hospital":"Kylie a passé une semaine à l'hôpital (correct)","Rebecca got married":"Rebecca s'est mariée","Kylie moved to another town":"Kylie a déménagé","They stopped being friends":"Elles ont arrêté d'être amies"}}),
+      mcq("Why did Rebecca move away?","Choose the correct answer.","Her father changed his job",["She went to university","Her parents got divorced","She wanted to live near the beach"],{fr:"Pourquoi Rebecca a-t-elle déménagé ?", optionsFr:{"Her father changed his job":"Son père a changé de travail (correct)","She went to university":"Elle est partie à l'université","Her parents got divorced":"Ses parents ont divorcé","She wanted to live near the beach":"Elle voulait vivre près de la plage"}}),
+      mcq("How do Kylie and Rebecca stay in touch now?","Choose the correct answer.","Phone, Skype and e-mails",["They see each other every week","They write letters only","They don't stay in touch anymore"],{fr:"Comment Kylie et Rebecca restent-elles en contact maintenant ?", optionsFr:{"Phone, Skype and e-mails":"Téléphone, Skype et e-mails (correct)","They see each other every week":"Elles se voient chaque semaine","They write letters only":"Elles s'écrivent des lettres seulement","They don't stay in touch anymore":"Elles ne restent plus en contact"}})
+    ]
+  },
+  {
+    id: "tina-will",
+    title: "Friends for life",
+    blurb: "Tina and Will talk about how their friendship has changed since university",
+    lang: "en-GB",
+    text: "Tina and I got on very well together at university. When we first met, we clicked straightaway and we ended up sharing a house for nearly three years. We had the same attitude to the important things in life and the only thing we argued about was the housework. I'm a Virgo so I'm very tidy whereas Tina's the opposite. When I left university, I moved to London and got a job in a finance company. I have to work long hours and I don't really enjoy what I'm doing but I earn a very good salary. I'm very ambitious and I want to get to the top of my profession. Tina's working really hard as well, but she's not earning much. I don't understand why she's doing it. I think she's having a holiday, it seems very idealistic to me. Anyway, it means that our lifestyles are very different now so we've drifted apart. We haven't fallen out or anything. We still talk on the phone and when I go down to visit her, we have a laugh. I know she'll always be there for me but it isn't like it used to be.",
+    questions: [
+      mcq("Where did Tina and Will meet?","Choose the correct answer.","At university",["At work","On holiday","At school"],{fr:"Où Tina et Will se sont-ils rencontrés ?", optionsFr:{"At university":"À l'université (correct)","At work":"Au travail","On holiday":"En vacances","At school":"À l'école"}}),
+      mcq("What did they use to argue about?","Choose the correct answer.","The housework",["Money","Politics","Their studies"],{fr:"À propos de quoi se disputaient-ils ?", optionsFr:{"The housework":"Le ménage (correct)","Money":"L'argent","Politics":"La politique","Their studies":"Leurs études"}}),
+      mcq("What job does Will have now?","Choose the correct answer.","He works in a finance company",["He's a teacher","He's unemployed","He works in music"],{fr:"Quel métier Will exerce-t-il maintenant ?", optionsFr:{"He works in a finance company":"Il travaille dans une entreprise financière (correct)","He's a teacher":"Il est professeur","He's unemployed":"Il est au chômage","He works in music":"Il travaille dans la musique"}}),
+      mcq("What does Will think about Tina's job?","Choose the correct answer.","He thinks she's not earning much and it seems idealistic to him",["He thinks she earns more than him","He thinks she should quit","He doesn't know what she does"],{fr:"Que pense Will du travail de Tina ?", optionsFr:{"He thinks she's not earning much and it seems idealistic to him":"Il pense qu'elle ne gagne pas beaucoup et que ça semble idéaliste (correct)","He thinks she earns more than him":"Il pense qu'elle gagne plus que lui","He thinks she should quit":"Il pense qu'elle devrait arrêter","He doesn't know what she does":"Il ne sait pas ce qu'elle fait"}}),
+      mcq("Why have Tina and Will drifted apart?","Choose the correct answer.","Their lifestyles are very different now",["They had a big argument","Tina moved abroad","Will got married"],{fr:"Pourquoi Tina et Will se sont-ils éloignés ?", optionsFr:{"Their lifestyles are very different now":"Leurs modes de vie sont très différents maintenant (correct)","They had a big argument":"Ils se sont beaucoup disputés","Tina moved abroad":"Tina a déménagé à l'étranger","Will got married":"Will s'est marié"}}),
+      mcq("Have Tina and Will fallen out?","Choose the correct answer.","No, they still talk on the phone and see each other",["Yes, they don't speak anymore",'Yes, they had a big fight',"They only communicate by e-mail"],{fr:"Tina et Will se sont-ils brouillés ?", optionsFr:{"No, they still talk on the phone and see each other":"Non, ils se parlent encore au téléphone et se voient (correct)","Yes, they don't speak anymore":"Oui, ils ne se parlent plus","Yes, they had a big fight":"Oui, ils se sont disputés violemment","They only communicate by e-mail":"Ils ne communiquent que par e-mail"}})
+    ]
+  }
+];
+
 /* ---------- 1. Personality adjectives (meaning matching) ---------- */
 function buildPersonalityExercises(){
   // [english word, english definition, french word, french definition]
@@ -828,7 +867,8 @@ function loadState(){
     streak: 0,
     lastPlayedDate: null,
     totalXP: 0,
-    showTranslations: false
+    showTranslations: false,
+    listeningScores: {} // textId -> {best}
   }, saved);
 }
 function saveState(){
@@ -869,6 +909,12 @@ function render(){
     const unitId = hash.replace("play-","");
     const unit = UNITS.find(u=>u.id===unitId);
     if(unit) return renderPlay(unit);
+  }
+  if(hash === "listening"){ return renderListeningMenu(); }
+  if(hash.startsWith("listen-")){
+    const textId = hash.replace("listen-","");
+    const text = LISTENING_TEXTS.find(t=>t.id===textId);
+    if(text) return renderListeningPlay(text);
   }
   renderHome();
 }
@@ -944,16 +990,25 @@ function renderHome(){
         <span class="lbl">Stars</span>
       </div>
     </div>
+    <div class="unit-card current" id="card-listening" style="background:linear-gradient(155deg,var(--accent-soft),var(--surface));">
+      <div class="unit-badge">🎧</div>
+      <div class="unit-info">
+        <h3>Listening</h3>
+        <p>Écoute un texte lu à voix haute et réponds aux questions</p>
+      </div>
+      <div class="unit-chevron">›</div>
+    </div>
     <div class="section-title">Choisis une mission</div>
     <div class="path">${unitsHtml}</div>
   `;
 
-  app.querySelectorAll(".unit-card").forEach(card=>{
+  app.querySelectorAll(".unit-card:not(#card-listening)").forEach(card=>{
     card.addEventListener("click", ()=>{
       if(card.classList.contains("locked")) return;
       go("play-"+card.dataset.unit);
     });
   });
+  document.getElementById("card-listening").addEventListener("click", ()=> go("listening"));
 
   document.getElementById("btn-howto").addEventListener("click", showHowToModal);
   document.getElementById("btn-parent-toggle").addEventListener("click", ()=>{
@@ -1025,7 +1080,10 @@ function showHowToModal(){
     <p style="font-size:14px;margin:0 0 12px;">Tu peux rejouer une mission déjà terminée pour améliorer ton score et gagner plus d'étoiles. Ta progression est sauvegardée automatiquement sur cet appareil.</p>
 
     <h3>5. 🇫🇷 Traductions</h3>
-    <p style="font-size:14px;margin:0;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
+    <p style="font-size:14px;margin:0 0 12px;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
+
+    <h3>6. 🎧 Listening</h3>
+    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil lit un texte à voix haute (bouton ▶️) : écoute-le une ou plusieurs fois, puis réponds aux questions sans regarder le texte écrit. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
   `);
 }
 
@@ -1047,6 +1105,213 @@ function showParentModal(){
     document.querySelector(".modal-overlay").remove();
     renderHome();
   });
+}
+
+/* ---------- LISTENING ---------- */
+function speak(text, lang){
+  try{
+    if(!('speechSynthesis' in window)) return false;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = lang || "en-GB";
+    utter.rate = 0.92;
+    window.speechSynthesis.speak(utter);
+    return true;
+  }catch(e){ return false; }
+}
+function stopSpeaking(){
+  try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){}
+}
+
+function renderListeningMenu(){
+  session = null;
+  stopSpeaking();
+  const cardsHtml = LISTENING_TEXTS.map(t=>{
+    const rec = state.listeningScores && state.listeningScores[t.id];
+    const scoreHtml = rec ? `<span style="color:var(--gold);font-size:12px;">Meilleur score : ${rec.best}/${t.questions.length}</span>` : `<span style="font-size:12px;color:var(--text-muted);">Pas encore essayé</span>`;
+    return `
+      <div class="unit-card current" data-text="${t.id}">
+        <div class="unit-badge">🎧</div>
+        <div class="unit-info">
+          <h3>${t.title}</h3>
+          <p>${t.blurb}<br>${scoreHtml}</p>
+        </div>
+        <div class="unit-chevron">›</div>
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div style="flex:1;"></div>
+    </div>
+    <div class="hero" style="background:linear-gradient(155deg,var(--accent) 0%, var(--accent-dark) 100%);">
+      <div class="avatar">🎧</div>
+      <div>
+        <h1>Listening</h1>
+        <p>Écoute et réponds sans regarder le texte</p>
+      </div>
+    </div>
+    <div class="translation-hint" style="margin-top:0;">
+      <span class="flag">💡</span>
+      <span>Écoute d'abord le texte une ou plusieurs fois (bouton ▶️), puis réponds aux questions. Le texte écrit n'apparaît qu'à la fin, pour la correction.</span>
+    </div>
+    <div class="section-title">Choisis un texte</div>
+    <div class="path">${cardsHtml}</div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>go(""));
+  app.querySelectorAll(".unit-card").forEach(card=>{
+    card.addEventListener("click", ()=> go("listen-"+card.dataset.text));
+  });
+}
+
+function renderListeningPlay(textItem){
+  if(!session || session.kind!=="listening" || session.textId!==textItem.id){
+    session = {
+      kind:"listening",
+      textId: textItem.id,
+      idx: 0,
+      correctCount: 0,
+      total: textItem.questions.length,
+      answered: false,
+      playsUsed: 0
+    };
+  }
+  if(session.idx >= session.total){ return renderListeningResult(textItem); }
+
+  const item = session.questions ? session.questions[session.idx] : textItem.questions[session.idx];
+  const progressPct = Math.round((session.idx/session.total)*100);
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="prompt-kicker">🎧 ${textItem.title}</div>
+      <p class="prompt-sub" style="margin-bottom:12px;">Réécoute autant de fois que nécessaire avant de répondre.</p>
+      <button class="btn btn-primary" id="btn-play" style="width:100%;">▶️ Écouter le texte</button>
+    </div>
+    <div class="card" id="exercise-card"></div>
+    <div class="bottom-bar" id="bottom-bar"></div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>{ stopSpeaking(); go("listening"); });
+  document.getElementById("btn-play").addEventListener("click", ()=>{
+    session.playsUsed++;
+    const ok = speak(textItem.text, textItem.lang);
+    if(!ok){
+      document.getElementById("btn-play").textContent = "⚠️ Lecture audio indisponible sur ce navigateur";
+    }
+  });
+
+  renderListeningExercise(item, textItem);
+}
+
+function renderListeningExercise(item, textItem){
+  const cardEl = document.getElementById("exercise-card");
+  const barEl = document.getElementById("bottom-bar");
+  session.answered = false;
+  const trOn = !!state.showTranslations;
+  const frHint = (trOn && item.fr) ? `<div class="translation-hint"><span class="flag">🇫🇷</span><span>${item.fr}</span></div>` : "";
+
+  cardEl.innerHTML = `
+    <div class="prompt-kicker">Question ${session.idx+1}/${session.total}</div>
+    <p class="prompt">${item.prompt}</p>
+    <p class="prompt-sub">${item.sub}</p>
+    ${frHint}
+    <div class="choices">
+      ${item.options.map(opt=>{
+        const optFr = (trOn && item.optionsFr && item.optionsFr[opt]) ? `<span class="opt-fr">🇫🇷 ${item.optionsFr[opt]}</span>` : "";
+        return `<button class="choice" data-opt="${escapeAttr(opt)}">${opt}${optFr}</button>`;
+      }).join("")}
+    </div>
+  `;
+  barEl.innerHTML = `<button class="btn btn-primary" id="btn-check" disabled>Check</button>`;
+  let selected = null;
+  cardEl.querySelectorAll(".choice").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(session.answered) return;
+      cardEl.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selected = btn.dataset.opt;
+      document.getElementById("btn-check").disabled = false;
+    });
+  });
+  document.getElementById("btn-check").addEventListener("click", ()=>{
+    if(!selected || session.answered) return;
+    const isCorrect = selected === item.correct;
+    session.answered = true;
+    if(isCorrect) session.correctCount++;
+    cardEl.querySelectorAll(".choice").forEach(b=>{
+      b.disabled = true;
+      if(b.dataset.opt === item.correct) b.classList.add("correct");
+      else if(b.dataset.opt === selected) b.classList.add("wrong");
+    });
+    const panelClass = isCorrect ? "ok" : "ko";
+    const emoji = isCorrect ? "🎉" : "😿";
+    const correctFr = (trOn && item.optionsFr && item.optionsFr[item.correct]) ? ` <span style="opacity:.8;">(🇫🇷 ${item.optionsFr[item.correct]})</span>` : "";
+    const text = isCorrect ? "" : `Correct answer: <strong>${item.correct}</strong>${correctFr}.`;
+    barEl.innerHTML = `
+      <div class="feedback-panel ${panelClass}">
+        <div class="emoji">${emoji}</div>
+        <div>
+          <p class="fb-title">${isCorrect?pickPraise():"Not quite!"}</p>
+          <p class="fb-text">${text}</p>
+        </div>
+      </div>
+      <button class="btn ${isCorrect?'btn-success':'btn-error'}" id="btn-continue">Continue</button>
+    `;
+    document.getElementById("btn-continue").addEventListener("click", ()=>{
+      stopSpeaking();
+      session.idx++;
+      renderListeningPlay(textItem);
+    });
+  });
+}
+
+function renderListeningResult(textItem){
+  stopSpeaking();
+  if(!state.listeningScores) state.listeningScores = {};
+  const prevBest = (state.listeningScores[textItem.id] && state.listeningScores[textItem.id].best) || 0;
+  state.listeningScores[textItem.id] = { best: Math.max(prevBest, session.correctCount) };
+  registerPlaySession();
+  saveState();
+
+  const pct = session.total>0 ? session.correctCount/session.total : 0;
+  let stars = 1;
+  if(pct>=0.95) stars = 3;
+  else if(pct>=0.75) stars = 2;
+  const starsHtml = `<div style="font-size:40px;letter-spacing:6px;">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div>`;
+
+  app.innerHTML = `
+    <div class="topbar">
+      <button class="iconbtn" id="btn-exit">✕</button>
+      <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
+    </div>
+    <div class="result-wrap">
+      <div class="result-emoji">🎧</div>
+      <h2>Listening terminé !</h2>
+      ${starsHtml}
+      <div class="result-stats">
+        <div class="stat-pill">
+          <span class="num">${session.correctCount}/${session.total}</span>
+          <span class="lbl">Correct</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="text-align:left;">
+      <p class="prompt-kicker">📖 Texte complet (pour te corriger)</p>
+      <p style="font-size:14px;line-height:1.6;">${textItem.text}</p>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-primary" id="btn-retry">Réécouter et refaire</button>
+      <div style="height:8px;"></div>
+      <button class="btn btn-ghost" id="btn-back">Retour aux textes</button>
+    </div>
+  `;
+  document.getElementById("btn-exit").addEventListener("click", ()=>go(""));
+  document.getElementById("btn-back").addEventListener("click", ()=>{ session=null; go("listening"); });
+  document.getElementById("btn-retry").addEventListener("click", ()=>{ session=null; go("listen-"+textItem.id); });
 }
 
 /* ---------- PLAY SESSION ---------- */

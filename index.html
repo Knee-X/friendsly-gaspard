@@ -326,6 +326,18 @@ h1,h2,h3,.display{font-family:'Baloo 2',system-ui,sans-serif;text-wrap:balance;}
 
 .hearts-lost-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:2px;}
 
+.level-badge{
+  display:inline-block;
+  font-size:10.5px;
+  font-weight:700;
+  font-family:'Inter',sans-serif;
+  border:1.5px solid currentColor;
+  border-radius:999px;
+  padding:1px 8px;
+  vertical-align:middle;
+  margin-left:2px;
+}
+
 /* ---------- Home top row & modal ---------- */
 .home-toprow{display:flex;justify-content:flex-end;gap:8px;}
 .pill-btn{
@@ -585,6 +597,7 @@ const LISTENING_TEXTS = [
     id: "rebecca",
     title: "My friend Rebecca",
     blurb: "Kylie talks about her friendship with Rebecca",
+    level: "easy",
     lang: "en-GB",
     text: "I have known my friend Rebecca for a long time. We first met at a friend's birthday party five years ago. We found out that we both liked techno and Green Day. So, I invited Rebecca over to my place. We listened to music together and soon became best friends. Three years ago, Rebecca's parents invited me to go on holiday with them. It was great! We spent three wonderful weeks in a little cottage in Ireland. Rebecca and I loved walking along the beautiful beach. We took a lot of photos and had a lot of fun. Two years ago, I spent a week in hospital and Rebecca came to see me every day. But then, last year, Rebecca's father changed his job, and they moved to another town. Since then, we haven't seen each other very much, but we've talked on the phone or via Skype and we've written e-mails to each other.",
     questions: [
@@ -600,6 +613,7 @@ const LISTENING_TEXTS = [
     id: "tina-will",
     title: "Friends for life",
     blurb: "Tina and Will talk about how their friendship has changed since university",
+    level: "medium",
     lang: "en-GB",
     text: "Tina and I got on very well together at university. When we first met, we clicked straightaway and we ended up sharing a house for nearly three years. We had the same attitude to the important things in life and the only thing we argued about was the housework. I'm a Virgo so I'm very tidy whereas Tina's the opposite. When I left university, I moved to London and got a job in a finance company. I have to work long hours and I don't really enjoy what I'm doing but I earn a very good salary. I'm very ambitious and I want to get to the top of my profession. Tina's working really hard as well, but she's not earning much. I don't understand why she's doing it. I think she's having a holiday, it seems very idealistic to me. Anyway, it means that our lifestyles are very different now so we've drifted apart. We haven't fallen out or anything. We still talk on the phone and when I go down to visit her, we have a laugh. I know she'll always be there for me but it isn't like it used to be.",
     questions: [
@@ -615,6 +629,7 @@ const LISTENING_TEXTS = [
     id: "best-friend-story",
     title: "How I met my best friend",
     blurb: "Leo tells the story of how he became friends with Max",
+    level: "easy",
     lang: "en-GB",
     text: "My best friend's name is Max, and I've known him for eight years now. We met at primary school when we were both seven. On my first day, I was very shy and I didn't know anyone. Max came over to me during lunch break and asked if I wanted to play football with him. I said yes, and we've been friends ever since. We have a lot in common: we both love video games and we support the same football team. We're not exactly the same, though. I'm quite calm and patient, but Max is more headstrong and he sometimes acts before thinking. Last year, we had a small argument about a video game tournament, but we patched up our differences the next day. Max has always been there for me, especially two years ago when my parents got divorced. He came round to my house every day for a month just to keep me company. I think a true friend is someone who's a shoulder to cry on when things go wrong. Next year, we're going to the same secondary school, so I know we'll stay close for a long time.",
     questions: [
@@ -630,6 +645,7 @@ const LISTENING_TEXTS = [
     id: "fell-out-story",
     title: "The day we fell out",
     blurb: "Chloe talks about a big argument with her friend Zoe and how they made up",
+    level: "medium",
     lang: "en-GB",
     text: "Zoe and I have been close friends since we were ten, but last month we had the worst argument of our friendship. It all started because Zoe borrowed my favourite jacket without asking me, and then she lost it at a party. When I found out, I was furious and I told her exactly what I thought. We didn't speak to each other for almost two weeks. Some of our classmates tried to help us make it up, but I was too proud to call her first. Then, one afternoon, Zoe sent me a long message. She apologised and said she'd buy me a new jacket. I realised I'd overreacted a bit too, so I replied and we agreed to meet at our usual café to clear the air. We talked for hours about what had happened and why it had upset us both so much. In the end, we decided to bury the hatchet completely. Zoe is honest and caring, and I know she didn't lose the jacket on purpose. Since that day, we've actually become even closer, because we learnt how to communicate better when we disagree about something.",
     questions: [
@@ -645,6 +661,7 @@ const LISTENING_TEXTS = [
     id: "pen-pal-story",
     title: "My pen pal from Canada",
     blurb: "Amelia describes her long-distance friendship with Noah, who lives in Canada",
+    level: "medium",
     lang: "en-GB",
     text: "I've had a pen pal called Noah for three years now. We first got in touch through a school exchange programme, when our English teacher paired us up so that I could practise my English and he could practise his French. Noah lives in Montreal, in Canada, so we've never actually met in person, but we message each other almost every day. At the beginning, we only talked about school and homework, but now we tell each other almost everything: our families, our hobbies, and even our problems. Noah is very tolerant and easy-going, and he always knows how to make me laugh when I'm having a bad day. We don't always see eye to eye, though. For example, he thinks winter sports are the best thing in the world, while I much prefer summer at the beach. Last year, Noah's family finally saved enough money to plan a trip to Europe, and they're coming to visit my country next summer. I can't wait to finally give him a real hug instead of just a video call. I think our friendship shows that you don't need to live close to someone to really get on well with them.",
     questions: [
@@ -654,6 +671,54 @@ const LISTENING_TEXTS = [
       mcq("What do they disagree about?","Choose the correct answer.","Winter sports versus summer at the beach",["Which language to use","School subjects","Which country is better"],{fr:"Sur quoi ne sont-ils pas d'accord ?", optionsFr:{"Winter sports versus summer at the beach":"Les sports d'hiver contre l'été à la plage","Which language to use":"Quelle langue utiliser","School subjects":"Les matières scolaires","Which country is better":"Quel pays est le meilleur"}}),
       mcq("What are Noah's plans for next summer?","Choose the correct answer.","Visit Amelia's country with his family",["Move to Amelia's country","Invite Amelia to Canada","Stop being pen pals"],{fr:"Quels sont les projets de Noah pour l'été prochain ?", optionsFr:{"Visit Amelia's country with his family":"Visiter le pays d'Amelia avec sa famille","Move to Amelia's country":"Déménager dans le pays d'Amelia","Invite Amelia to Canada":"Inviter Amelia au Canada","Stop being pen pals":"Arrêter d'être correspondants"}}),
       mcq("What does Amelia think her friendship with Noah shows?","Choose the correct answer.","You don't need to live close to someone to get on well with them",["Long-distance friendships never work","You should only be friends with people nearby","Video calls are better than real meetings"],{fr:"Que pense Amelia que leur amitié démontre ?", optionsFr:{"You don't need to live close to someone to get on well with them":"Pas besoin d'habiter près de quelqu'un pour bien s'entendre avec lui","Long-distance friendships never work":"Les amitiés à distance ne marchent jamais","You should only be friends with people nearby":"Il faut seulement être ami avec des gens proches","Video calls are better than real meetings":"Les appels vidéo sont mieux que les vraies rencontres"}})
+    ]
+  },
+  {
+    id: "reunion-story",
+    title: "The reunion that almost didn't happen",
+    blurb: "Priya reflects on a complicated reunion with a childhood friend she'd lost touch with",
+    level: "hard",
+    lang: "en-GB",
+    text: "Although Hannah and I had been inseparable throughout primary school, we drifted apart almost as soon as we started secondary school, mainly because we ended up in different classes and gradually stopped making the effort to see each other. For years, I assumed it was simply what happened to childhood friendships, and I didn't think much more about it, until last spring, when a mutual friend mentioned that Hannah had been going through a really difficult time after her parents' divorce. Feeling guilty that I hadn't been there for her, I decided to get in touch, even though I had no idea whether she would want to hear from me after all this time. To my relief, she replied almost immediately, admitting that she had often thought about reaching out herself but hadn't known how to break the silence. When we finally met up at the café where we used to do our homework together, it was strange at first, since so much had changed, but within an hour we were laughing about our old teachers as if no time had passed at all. What struck me most was that, despite everything, we still saw eye to eye on the things that mattered most to us. Hannah admitted she had been a fair-weather friend to some people in her life, disappearing when things got hard, but she said our reunion had taught her the value of being someone others could rely on. Since that afternoon, we've made a point of meeting up at least once a month, and I've realised that some friendships, even after long silences, are worth fighting to rebuild.",
+    questions: [
+      mcq("When did Priya and Hannah start growing apart?","Choose the correct answer.","As soon as they started secondary school",["During primary school","After Hannah's parents divorced","When Hannah moved abroad"],{fr:"Quand Priya et Hannah ont-elles commencé à s'éloigner ?", optionsFr:{"As soon as they started secondary school":"Dès leur entrée au secondaire","During primary school":"Pendant l'école primaire","After Hannah's parents divorced":"Après le divorce des parents de Hannah","When Hannah moved abroad":"Quand Hannah a déménagé à l'étranger"}}),
+      mcq("What made Priya decide to get back in touch with Hannah?","Choose the correct answer.","She heard Hannah was struggling after her parents' divorce",["She saw Hannah at a party","Hannah sent her a message first","She needed help with homework"],{fr:"Qu'est-ce qui a poussé Priya à recontacter Hannah ?", optionsFr:{"She heard Hannah was struggling after her parents' divorce":"Elle a appris que Hannah traversait une période difficile après le divorce de ses parents","She saw Hannah at a party":"Elle a vu Hannah à une fête","Hannah sent her a message first":"Hannah lui a écrit en premier","She needed help with homework":"Elle avait besoin d'aide pour ses devoirs"}}),
+      mcq("How did Hannah react when Priya reached out?","Choose the correct answer.","She replied almost immediately and admitted she'd wanted to reach out too",["She didn't reply for months","She was angry and refused to talk","She said it was too late for their friendship"],{fr:"Comment Hannah a-t-elle réagi quand Priya l'a recontactée ?", optionsFr:{"She replied almost immediately and admitted she'd wanted to reach out too":"Elle a répondu presque tout de suite et a avoué qu'elle voulait aussi reprendre contact","She didn't reply for months":"Elle n'a pas répondu pendant des mois","She was angry and refused to talk":"Elle était en colère et a refusé de parler","She said it was too late for their friendship":"Elle a dit qu'il était trop tard pour leur amitié"}}),
+      mcq("What surprised Priya most when they finally met up?","Choose the correct answer.","They still agreed on the things that mattered most, despite everything changing",["They had nothing left to talk about","Hannah looked completely different","The café had closed down"],{fr:"Qu'est-ce qui a le plus surpris Priya lors de leurs retrouvailles ?", optionsFr:{"They still agreed on the things that mattered most, despite everything changing":"Elles étaient toujours d'accord sur l'essentiel, malgré tous les changements","They had nothing left to talk about":"Elles n'avaient plus rien à se dire","Hannah looked completely different":"Hannah avait complètement changé physiquement","The café had closed down":"Le café avait fermé"}}),
+      mcq("What did Hannah admit about herself?","Choose the correct answer.","That she had sometimes been a fair-weather friend to others",["That she had never had any real friends","That she regretted going to secondary school","That she didn't like Priya anymore"],{fr:"Que Hannah a-t-elle admis à propos d'elle-même ?", optionsFr:{"That she had sometimes been a fair-weather friend to others":"Qu'elle avait parfois été une amie 'des beaux jours' avec d'autres personnes","That she had never had any real friends":"Qu'elle n'avait jamais eu de vrais amis","That she regretted going to secondary school":"Qu'elle regrettait d'être allée au secondaire","That she didn't like Priya anymore":"Qu'elle n'aimait plus Priya"}}),
+      mcq("How often do Priya and Hannah meet up now?","Choose the correct answer.","At least once a month",["Every single day","Only once a year","They haven't met again since"],{fr:"À quelle fréquence Priya et Hannah se voient-elles maintenant ?", optionsFr:{"At least once a month":"Au moins une fois par mois","Every single day":"Tous les jours","Only once a year":"Une seule fois par an","They haven't met again since":"Elles ne se sont pas revues depuis"}})
+    ]
+  },
+  {
+    id: "volunteer-story",
+    title: "Friends who volunteer together",
+    blurb: "Ethan explains how volunteering with his friend Oscar changed their friendship",
+    level: "hard",
+    lang: "en-GB",
+    text: "Oscar and I had been mates since we were eleven, but it wasn't until we started volunteering together at a local animal shelter, two years ago, that our friendship really deepened. We'd signed up mainly so as to add something useful to our university applications, and, to be honest, neither of us expected to enjoy it as much as we did. Every Saturday morning, we would walk the dogs that hadn't been adopted yet, in order to help them get used to being around people again, since many of them had been mistreated by their previous owners. It was often exhausting and occasionally heartbreaking, especially when an animal we'd grown attached to finally got adopted, or, worse, when one didn't. What I hadn't anticipated was how much the experience would reveal about Oscar's character. He turned out to be far more patient and caring than I had given him credit for, and he never once complained, even on the coldest mornings. There was a period, around six months in, when we very nearly fell out, because I felt he was taking on too much responsibility and burning himself out, while he accused me of not caring enough. We eventually cleared the air during a long walk home, and realised we'd both been under a lot of stress from exams at the same time. Looking back, I don't think our friendship would have survived secondary school without that shared project. We've been volunteering there for two years now, and we've recently started training new volunteers together, which has taught us both a great deal about patience, responsibility, and, above all, about what it really means to rely on someone.",
+    questions: [
+      mcq("What was the original reason Oscar and Ethan started volunteering?","Choose the correct answer.","To add something useful to their university applications",["They loved animals since childhood","A teacher forced them to","Oscar's parents owned the shelter"],{fr:"Quelle était la raison initiale d'Oscar et Ethan pour faire du bénévolat ?", optionsFr:{"To add something useful to their university applications":"Ajouter quelque chose d'utile à leurs candidatures universitaires","They loved animals since childhood":"Ils aimaient les animaux depuis l'enfance","A teacher forced them to":"Un professeur les y a obligés","Oscar's parents owned the shelter":"Les parents d'Oscar possédaient le refuge"}}),
+      mcq("Why did they walk the dogs every Saturday?","Choose the correct answer.","To help the dogs get used to being around people again",["To exercise themselves","To find the dogs new owners directly","Because it was required for school"],{fr:"Pourquoi promenaient-ils les chiens chaque samedi ?", optionsFr:{"To help the dogs get used to being around people again":"Pour aider les chiens à se réhabituer à la présence humaine","To exercise themselves":"Pour faire de l'exercice eux-mêmes","To find the dogs new owners directly":"Pour trouver directement de nouveaux propriétaires aux chiens","Because it was required for school":"Parce que c'était obligatoire pour l'école"}}),
+      mcq("What did Ethan discover about Oscar's character?","Choose the correct answer.","He was more patient and caring than Ethan had expected",["He was lazier than expected","He didn't really like animals","He wanted to quit after one week"],{fr:"Qu'est-ce qu'Ethan a découvert sur le caractère d'Oscar ?", optionsFr:{"He was more patient and caring than Ethan had expected":"Il était plus patient et attentionné qu'Ethan ne le pensait","He was lazier than expected":"Il était plus paresseux que prévu","He didn't really like animals":"Il n'aimait pas vraiment les animaux","He wanted to quit after one week":"Il voulait arrêter après une semaine"}}),
+      mcq("Why did they nearly fall out around six months in?","Choose the correct answer.","Ethan felt Oscar was taking on too much and burning himself out",["They disagreed about which dog to adopt","Oscar wanted to stop volunteering","They argued about money"],{fr:"Pourquoi ont-ils failli se brouiller après environ six mois ?", optionsFr:{"Ethan felt Oscar was taking on too much and burning himself out":"Ethan trouvait qu'Oscar en faisait trop et s'épuisait","They disagreed about which dog to adopt":"Ils n'étaient pas d'accord sur quel chien adopter","Oscar wanted to stop volunteering":"Oscar voulait arrêter le bénévolat","They argued about money":"Ils se sont disputés à propos d'argent"}}),
+      mcq("How did they resolve their disagreement?","Choose the correct answer.","They cleared the air during a long walk home and realised they were both stressed about exams",["A teacher mediated between them","They stopped talking for a month","They never actually resolved it"],{fr:"Comment ont-ils résolu leur désaccord ?", optionsFr:{"They cleared the air during a long walk home and realised they were both stressed about exams":"Ils ont clarifié la situation lors d'une longue marche et ont réalisé qu'ils étaient tous deux stressés par les examens","A teacher mediated between them":"Un professeur a fait le médiateur entre eux","They stopped talking for a month":"Ils ont arrêté de se parler pendant un mois","They never actually resolved it":"Ils ne l'ont en fait jamais résolu"}}),
+      mcq("What are Oscar and Ethan doing now, after two years of volunteering?","Choose the correct answer.","Training new volunteers together",["They have both quit the shelter","Running the shelter on their own","Studying veterinary medicine"],{fr:"Que font Oscar et Ethan maintenant, après deux ans de bénévolat ?", optionsFr:{"Training new volunteers together":"Ils forment ensemble de nouveaux bénévoles","They have both quit the shelter":"Ils ont tous les deux quitté le refuge","Running the shelter on their own":"Ils dirigent le refuge tout seuls","Studying veterinary medicine":"Ils étudient la médecine vétérinaire"}})
+    ]
+  },
+  {
+    id: "group-chat-story",
+    title: "When a group chat nearly destroyed our friendship",
+    blurb: "Maya describes a misunderstanding in a group chat that almost ended a long friendship",
+    level: "hard",
+    lang: "en-GB",
+    text: "Looking back, I still find it hard to believe that a friendship which had survived nearly a decade nearly ended because of a single misread message in a group chat. It happened last winter, when our group of five friends had been organising a surprise party for Priya, who was turning sixteen. Somebody, I still don't know who, had accidentally added Priya to the wrong group chat, so that instead of seeing a chat about homework, she ended up reading several messages in which we were, admittedly, complaining about how difficult she'd become to plan things with lately. Naturally, she was devastated, and by the time I found out what had happened, she had already stopped replying to any of us, having decided we'd all been talking behind her back on purpose. What made the whole situation so complicated was that everyone had a slightly different version of what had actually been said and by whom, so instead of clearing the air quickly, we ended up arguing amongst ourselves about who was to blame for the mistake in the first place. It took nearly three weeks, several failed attempts at an apology, and one particularly awkward meeting at a café, before Priya finally agreed to sit down with all of us so as to sort things out properly. We each explained our side of the story, admitted where we'd been thoughtless, and eventually managed to make her understand that the comments, however badly worded, had come from frustration rather than dislike. What this whole experience taught me is that even friendships you'd consider unshakeable can be seriously tested by nothing more than a technological mistake, and that clearing up a misunderstanding properly is always worth the discomfort of an honest conversation, however long it takes.",
+    questions: [
+      mcq("What was the group originally planning when the mistake happened?","Choose the correct answer.","A surprise party for Priya's sixteenth birthday",["A school project","A holiday abroad","A charity event"],{fr:"Que planifiait le groupe quand l'erreur s'est produite ?", optionsFr:{"A surprise party for Priya's sixteenth birthday":"Une fête surprise pour les seize ans de Priya","A school project":"Un projet scolaire","A holiday abroad":"Des vacances à l'étranger","A charity event":"Un événement caritatif"}}),
+      mcq("How did Priya end up seeing the messages about her?","Choose the correct answer.","She was accidentally added to the wrong group chat",["A friend showed her on purpose","She found an old phone","Someone forwarded the messages to her"],{fr:"Comment Priya a-t-elle fini par voir les messages qui la concernaient ?", optionsFr:{"She was accidentally added to the wrong group chat":"Elle a été ajoutée par erreur au mauvais groupe de discussion","A friend showed her on purpose":"Une amie les lui a montrés exprès","She found an old phone":"Elle a trouvé un vieux téléphone","Someone forwarded the messages to her":"Quelqu'un lui a transféré les messages"}}),
+      mcq("Why did the group struggle to resolve the situation quickly?","Choose the correct answer.","Everyone had a different version of what had been said, so they argued about who was to blame",["Priya refused to ever speak to them again","They didn't have Priya's phone number","They didn't think it was a big deal"],{fr:"Pourquoi le groupe a-t-il eu du mal à résoudre la situation rapidement ?", optionsFr:{"Everyone had a different version of what had been said, so they argued about who was to blame":"Chacun avait une version différente de ce qui avait été dit, donc ils se sont disputés sur qui était responsable","Priya refused to ever speak to them again":"Priya a refusé de leur reparler à jamais","They didn't have Priya's phone number":"Ils n'avaient pas le numéro de Priya","They didn't think it was a big deal":"Ils ne pensaient pas que c'était grave"}}),
+      mcq("How long did it take before Priya agreed to talk things through?","Choose the correct answer.","Nearly three weeks",["A single afternoon","Six months","She never agreed to talk"],{fr:"Combien de temps a-t-il fallu avant que Priya accepte de discuter ?", optionsFr:{"Nearly three weeks":"Presque trois semaines","A single afternoon":"Un seul après-midi","Six months":"Six mois","She never agreed to talk":"Elle n'a jamais accepté de parler"}}),
+      mcq("What did the friends eventually make Priya understand?","Choose the correct answer.","The comments had come from frustration rather than dislike",["They had never actually written those messages","They didn't care about her feelings","They wanted to end the friendship"],{fr:"Qu'ont finalement fait comprendre les amis à Priya ?", optionsFr:{"The comments had come from frustration rather than dislike":"Les commentaires venaient de la frustration plutôt que de l'antipathie","They had never actually written those messages":"Ils n'avaient en fait jamais écrit ces messages","They didn't care about her feelings":"Ils se moquaient de ses sentiments","They wanted to end the friendship":"Ils voulaient mettre fin à l'amitié"}}),
+      mcq("What lesson does Maya take from this experience?","Choose the correct answer.","Even strong friendships can be tested, and honest conversations are worth having however hard they are",["Group chats should never be used","Some friendships aren't worth saving","Technology always ruins friendships"],{fr:"Quelle leçon Maya tire-t-elle de cette expérience ?", optionsFr:{"Even strong friendships can be tested, and honest conversations are worth having however hard they are":"Même les amitiés solides peuvent être mises à l'épreuve, et une conversation honnête vaut toujours la peine, aussi difficile soit-elle","Group chats should never be used":"Il ne faut jamais utiliser de groupes de discussion","Some friendships aren't worth saving":"Certaines amitiés ne valent pas la peine d'être sauvées","Technology always ruins friendships":"La technologie détruit toujours les amitiés"}})
     ]
   }
 ];
@@ -1137,7 +1202,13 @@ function showHowToModal(){
     <p style="font-size:14px;margin:0 0 12px;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
 
     <h3>6. 🎧 Listening</h3>
-    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil se joue en deux étapes. D'abord l'écoute : lis le texte à voix haute (bouton ▶️) autant de fois que tu veux, avec deux vitesses possibles (🐢 Lent / 🚶 Normal). Une fois prêt, clique sur "J'ai fini d'écouter" : tu passes alors à toutes les questions à la suite, sur un écran séparé, sans que l'audio ne redémarre ni ne s'arrête. Réponds à toutes les questions puis corrige-les d'un coup. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
+    <p style="font-size:14px;margin:0 0 12px;">La carte "Listening" sur l'accueil se joue en deux étapes. D'abord l'écoute : lis le texte à voix haute (bouton ▶️) autant de fois que tu veux, avec deux vitesses possibles (🐢 Lent / 🚶 Normal). Une fois prêt, clique sur "J'ai fini d'écouter" : tu passes alors à toutes les questions à la suite, sur un écran séparé, sans que l'audio ne redémarre ni ne s'arrête. Réponds à toutes les questions puis corrige-les d'un coup. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger.</p>
+    <div class="legend">
+      <span class="legend-chip" style="color:var(--success);border:1px solid var(--success);">Facile</span>
+      <span class="legend-chip" style="color:var(--gold);border:1px solid var(--gold);">Intermédiaire</span>
+      <span class="legend-chip" style="color:var(--error);border:1px solid var(--error);">Difficile</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:8px 0 0;">Chaque texte affiche un badge de niveau : commence par les textes "Facile" si tu débutes, puis monte en difficulté à l'approche de l'interro.</p>
   `);
 }
 
@@ -1221,17 +1292,25 @@ function stopSpeaking(){
   try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){}
 }
 
+const LEVEL_INFO = {
+  easy:   { label: "Facile",        color: "var(--success)" },
+  medium: { label: "Intermédiaire", color: "var(--gold)" },
+  hard:   { label: "Difficile",     color: "var(--error)" }
+};
+
 function renderListeningMenu(){
   session = null;
   stopSpeaking();
   const cardsHtml = LISTENING_TEXTS.map(t=>{
     const rec = state.listeningScores && state.listeningScores[t.id];
     const scoreHtml = rec ? `<span style="color:var(--gold);font-size:12px;">Meilleur score : ${rec.best}/${t.questions.length}</span>` : `<span style="font-size:12px;color:var(--text-muted);">Pas encore essayé</span>`;
+    const lvl = LEVEL_INFO[t.level] || LEVEL_INFO.medium;
+    const levelBadge = `<span class="level-badge" style="color:${lvl.color};border-color:${lvl.color};">${lvl.label}</span>`;
     return `
       <div class="unit-card current" data-text="${t.id}">
         <div class="unit-badge">🎧</div>
         <div class="unit-info">
-          <h3>${t.title}</h3>
+          <h3>${t.title} ${levelBadge}</h3>
           <p>${t.blurb}<br>${scoreHtml}</p>
         </div>
         <div class="unit-chevron">›</div>
@@ -1270,6 +1349,8 @@ function renderListeningAudio(textItem){
   const speedIsSlow = state.speechSpeed !== "normal";
   const voiceChoices = englishVoices();
   const activeVoice = pickBestVoice();
+  const lvl = LEVEL_INFO[textItem.level] || LEVEL_INFO.medium;
+  const levelBadge = `<span class="level-badge" style="color:${lvl.color};border-color:${lvl.color};">${lvl.label}</span>`;
   const voicePickerHtml = voiceChoices.length > 1 ? `
       <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:4px;">Voix (si celle-ci n'est pas claire, essaie une autre) :</label>
       <select id="voice-select" class="blank-input" style="margin-bottom:10px;font-size:13.5px;padding:9px 12px;">
@@ -1282,7 +1363,7 @@ function renderListeningAudio(textItem){
       <div style="flex:1;"></div>
     </div>
     <div class="card" style="margin-bottom:12px;">
-      <div class="prompt-kicker">🎧 ${textItem.title}</div>
+      <div class="prompt-kicker">🎧 ${textItem.title} ${levelBadge}</div>
       <p class="prompt-sub" style="margin-bottom:10px;">Réécoute autant de fois que nécessaire. L'écoute ne sera jamais interrompue une fois que tu passeras aux questions.</p>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
         <button class="pill-btn ${speedIsSlow?'active':''}" id="btn-speed-slow" style="flex:1;justify-content:center;">🐢 Lent</button>

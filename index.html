@@ -915,7 +915,8 @@ function loadState(){
     lastPlayedDate: null,
     totalXP: 0,
     showTranslations: false,
-    listeningScores: {} // textId -> {best}
+    listeningScores: {}, // textId -> {best}
+    speechSpeed: "slow" // "slow" or "normal"
   }, saved);
 }
 function saveState(){
@@ -1130,7 +1131,7 @@ function showHowToModal(){
     <p style="font-size:14px;margin:0 0 12px;">Active le bouton "Traductions" sur l'accueil pour voir les phrases et réponses en français pendant que tu t'entraînes. Conseil : entraîne-toi d'abord avec les traductions activées, puis désactive-les et refais la même mission sans aide pour vérifier que tu as bien retenu !</p>
 
     <h3>6. 🎧 Listening</h3>
-    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil lit un texte à voix haute (bouton ▶️) : écoute-le une ou plusieurs fois, puis réponds aux questions sans regarder le texte écrit. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
+    <p style="font-size:14px;margin:0;">La carte "Listening" sur l'accueil lit un texte à voix haute (bouton ▶️) : écoute-le une ou plusieurs fois, puis réponds aux questions sans regarder le texte écrit. Le texte complet ne s'affiche qu'à la toute fin, pour te corriger. Deux vitesses sont disponibles (🐢 Lent / 🚶 Normal) juste au-dessus du bouton d'écoute — choisis celle qui te convient le mieux. Idéal pour t'entraîner avant une interro de compréhension orale.</p>
   `);
 }
 
@@ -1155,13 +1156,15 @@ function showParentModal(){
 }
 
 /* ---------- LISTENING ---------- */
+const SPEECH_RATES = { slow: 0.62, normal: 0.8 };
 function speak(text, lang){
   try{
     if(!('speechSynthesis' in window)) return false;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = lang || "en-GB";
-    utter.rate = 0.92;
+    utter.rate = SPEECH_RATES[state.speechSpeed] || SPEECH_RATES.slow;
+    utter.pitch = 1;
     window.speechSynthesis.speak(utter);
     return true;
   }catch(e){ return false; }
@@ -1229,6 +1232,8 @@ function renderListeningPlay(textItem){
   const item = session.questions ? session.questions[session.idx] : textItem.questions[session.idx];
   const progressPct = Math.round((session.idx/session.total)*100);
 
+  const speedIsSlow = state.speechSpeed !== "normal";
+
   app.innerHTML = `
     <div class="topbar">
       <button class="iconbtn" id="btn-exit">✕</button>
@@ -1236,7 +1241,11 @@ function renderListeningPlay(textItem){
     </div>
     <div class="card" style="margin-bottom:12px;">
       <div class="prompt-kicker">🎧 ${textItem.title}</div>
-      <p class="prompt-sub" style="margin-bottom:12px;">Réécoute autant de fois que nécessaire avant de répondre.</p>
+      <p class="prompt-sub" style="margin-bottom:10px;">Réécoute autant de fois que nécessaire avant de répondre.</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button class="pill-btn ${speedIsSlow?'active':''}" id="btn-speed-slow" style="flex:1;justify-content:center;">🐢 Lent</button>
+        <button class="pill-btn ${!speedIsSlow?'active':''}" id="btn-speed-normal" style="flex:1;justify-content:center;">🚶 Normal</button>
+      </div>
       <button class="btn btn-primary" id="btn-play" style="width:100%;">▶️ Écouter le texte</button>
     </div>
     <div class="card" id="exercise-card"></div>
@@ -1249,6 +1258,12 @@ function renderListeningPlay(textItem){
     if(!ok){
       document.getElementById("btn-play").textContent = "⚠️ Lecture audio indisponible sur ce navigateur";
     }
+  });
+  document.getElementById("btn-speed-slow").addEventListener("click", ()=>{
+    state.speechSpeed = "slow"; saveState(); renderListeningPlay(textItem);
+  });
+  document.getElementById("btn-speed-normal").addEventListener("click", ()=>{
+    state.speechSpeed = "normal"; saveState(); renderListeningPlay(textItem);
   });
 
   renderListeningExercise(item, textItem);
